@@ -1,0 +1,33 @@
+<!-- DownSouth Realty rental move-in and affordability calculator. Self-contained, no external requests. Figures checked 23 Nov 2026. -->
+<div id="dsr-rent" style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;padding:16px;border:1px solid #d9d9d9;border-radius:8px;color:#222">
+<h2 style="margin-top:0">Rental affordability and move-in cost calculator</h2>
+<p style="font-size:14px">Enter the weekly rent and your household income to see what you need up front and how rent compares with income.</p>
+<style>#dsr-rent label{display:block;margin:10px 0 4px;font-size:14px;font-weight:bold}#dsr-rent input,#dsr-rent select{width:100%;padding:8px;font-size:16px;box-sizing:border-box}#dsr-rent .res{margin-top:16px;background:#f6f6f6;padding:12px;border-radius:6px}#dsr-rent .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e5e5e5;font-size:15px}#dsr-rent small{color:#555;font-size:12px;line-height:1.4;display:block;margin-top:10px}</style>
+<label for="r_rent">Weekly rent ($)</label><input id="r_rent" type="number" min="0" step="1" inputmode="decimal">
+<label for="r_inc">Household income before tax</label><input id="r_inc" type="number" min="0" step="1" inputmode="decimal">
+<label for="r_per">Income is per</label><select id="r_per"><option value="52">Year</option><option value="12">Month</option><option value="2">Fortnight</option><option value="1">Week</option></select>
+<label for="r_pet">Bringing a pet (not an assistance animal)?</label><select id="r_pet"><option value="0">No</option><option value="1">Yes</option></select>
+<div class="res" id="r_out" aria-live="polite">Enter a weekly rent and income to see results.</div>
+<small>General information only, not financial or legal advice. WA rules checked 23 Nov 2026 against Consumer Protection WA (consumerprotection.wa.gov.au/rental-bonds, updated 28 March 2026; BondLodgementform0626.pdf, June 2026): a landlord can ask for up to 4 weeks' rent as a bond (no limit where rent is over $1,200 a week), up to 2 weeks' rent in advance, and a $350 pet bond. The income comparison uses a common rule of thumb that rent should be about 30% or less of gross income. It is not a legal test and lenders and property managers set their own criteria. Actual bond and advance amounts are set in your lease.</small>
+</div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function f(n){return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function calc(){
+var rent=parseFloat($('r_rent').value),inc=parseFloat($('r_inc').value),per=parseFloat($('r_per').value),pet=$('r_pet').value==='1';
+var out=$('r_out');
+if(!(rent>0)){out.textContent='Enter a weekly rent and income to see results.';return}
+var bond=rent*4,adv=rent*2,pb=pet?350:0,tot=bond+adv+pb;
+var h='<div class="row"><span>Bond (4 weeks)</span><b>'+f(bond)+'</b></div><div class="row"><span>Rent in advance (2 weeks)</span><b>'+f(adv)+'</b></div>';
+if(pet)h+='<div class="row"><span>Pet bond</span><b>'+f(pb)+'</b></div>';
+h+='<div class="row"><span><b>Maximum due at move-in</b></span><b>'+f(tot)+'</b></div>';
+if(inc>0){var wk=inc*(per===52?1:per)/(per===52?52:(per===12?52/12:(per===2?2:1)));
+if(per===52)wk=inc/52;else if(per===12)wk=inc*12/52;else if(per===2)wk=inc/2;else wk=inc;
+var pct=rent/wk*100;
+h+='<div class="row"><span>Weekly income (before tax)</span><b>'+f(wk)+'</b></div><div class="row"><span>Rent as share of income</span><b>'+pct.toFixed(1)+'%</b></div>';
+h+='<p style="margin:10px 0 0;font-size:14px">'+(pct<=30?'At or under the common 30% guide.':'Over the common 30% guide. Many households pay more, but it may be a stretch.')+' Rent at 30% of this income would be about '+f(wk*0.3)+' a week.</p>';}
+out.innerHTML=h}
+['r_rent','r_inc','r_per','r_pet'].forEach(function(i){$(i).addEventListener('input',calc);$(i).addEventListener('change',calc)});
+})();
+</script>
