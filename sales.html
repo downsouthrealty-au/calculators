@@ -1,0 +1,54 @@
+<!-- DownSouth Realty WA buyer and seller calculator. Self-contained, no external requests. Rates checked 23 Nov 2026 (see source note). -->
+<div id="dsr-sale" style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;padding:16px;border:1px solid #d9d9d9;border-radius:8px;color:#222">
+<h2 style="margin-top:0">Buying and selling cost calculator (WA)</h2>
+<style>#dsr-sale label{display:block;margin:10px 0 4px;font-size:14px;font-weight:bold}#dsr-sale input,#dsr-sale select{width:100%;padding:8px;font-size:16px;box-sizing:border-box}#dsr-sale .res{margin-top:16px;background:#f6f6f6;padding:12px;border-radius:6px}#dsr-sale .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e5e5e5;font-size:15px}#dsr-sale small{color:#555;font-size:12px;line-height:1.4;display:block;margin-top:10px}#dsr-sale .tabs button{padding:8px 14px;font-size:15px;margin-right:6px;border:1px solid #999;background:#fff;cursor:pointer;border-radius:4px}#dsr-sale .tabs button.on{background:#222;color:#fff}</style>
+<div class="tabs"><button id="t_buy" class="on" type="button">I am buying</button><button id="t_sell" type="button">I am selling</button></div>
+<div id="p_buy">
+<label for="b_price">Purchase price ($)</label><input id="b_price" type="number" min="0" step="1000" inputmode="decimal">
+<label for="b_dep">Deposit you will put in ($)</label><input id="b_dep" type="number" min="0" step="1000" inputmode="decimal">
+<label for="b_rate">Interest rate (% a year). Use the rate your lender quotes.</label><input id="b_rate" type="number" min="0" step="0.01" inputmode="decimal">
+<label for="b_term">Loan term (years)</label><input id="b_term" type="number" min="1" max="40" step="1" value="30" inputmode="numeric">
+<label for="b_type">Buyer and property type</label><select id="b_type"><option value="g">Standard purchase of a home</option><option value="fe">First home buyer, established or new home (first home owner rate of duty)</option><option value="fv">First home buyer, vacant land (first home owner rate of duty)</option></select>
+<label for="b_other">Other costs: legal, settlement, inspections ($)</label><input id="b_other" type="number" min="0" step="100" inputmode="decimal">
+<div class="res" id="b_out" aria-live="polite">Enter a price to see results.</div>
+</div>
+<div id="p_sell" style="display:none">
+<label for="s_price">Expected sale price ($)</label><input id="s_price" type="number" min="0" step="1000" inputmode="decimal">
+<label for="s_comm">Agent commission (% of sale price, incl. GST)</label><input id="s_comm" value="2.5" type="number" min="0" step="0.01" inputmode="decimal">
+<label for="s_mkt">Marketing and other selling costs ($). Photography, drone and online marketing packages vary: ask your agent.</label><input id="s_mkt" type="number" min="0" step="100" inputmode="decimal">
+<label for="s_loan">Loan to pay out at settlement ($)</label><input id="s_loan" type="number" min="0" step="1000" inputmode="decimal">
+<div class="res" id="s_out" aria-live="polite">Enter a price to see results.</div>
+</div>
+<small>General information only, not financial, tax or legal advice. Transfer duty uses the WA general rate (Duties Fact Sheet Residential Land, wa.gov.au, updated 5 March 2026) and the first home owner rate of duty for contracts on or after 7 May 2026 (wa.gov.au first home owner rate fact sheet, updated 27 August 2026; 2026-27 Housing Taxation Package, 23 Oct 2026). First home owner duty rates are shown only when the price is within the limits ($800,000 home, $550,000 vacant land) and you must meet the eligibility rules. Check with RevenueWA (revenue.wa.gov.au). Mortgage registration is Landgate's $225.10 fee from 1 July 2026. Landgate's transfer registration fee depends on the price and is not included: use Landgate's Transfer Lodgement Fee Calculator. The first home owner grant is not included. Repayments are principal and interest at a fixed rate, for illustration. Ask your lender for a real quote. Rates and thresholds change, last checked 23 Nov 2026.</small>
+</div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function f(n){return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function c(v,b,r){return Math.ceil((v-b)/100)*r}
+function general(v){if(v<=120000)return c(v,0,1.90);if(v<=150000)return 2280+c(v,120000,2.85);if(v<=360000)return 3135+c(v,150000,3.80);if(v<=725000)return 11115+c(v,360000,4.75);return 28453+c(v,725000,5.15)}
+function duty(v,t){
+if(t==='fe'){if(v<=600000)return {d:0,n:'First home owner rate: no duty up to $600,000.'};if(v<=800000)return {d:c(v,600000,16.15),n:'First home owner concessional rate.'};return {d:general(v),n:'Over $800,000, so the general rate applies.'}}
+if(t==='fv'){if(v<=450000)return {d:0,n:'First home owner rate: no duty up to $450,000 on vacant land.'};if(v<=550000)return {d:c(v,450000,20.14),n:'First home owner concessional rate for vacant land.'};return {d:general(v),n:'Over $550,000, so the general rate applies.'}}
+return {d:general(v),n:'General rate.'}}
+function buy(){
+var p=parseFloat($('b_price').value),dep=parseFloat($('b_dep').value)||0,rate=parseFloat($('b_rate').value),yrs=parseFloat($('b_term').value)||30,oth=parseFloat($('b_other').value)||0,t=$('b_type').value,o=$('b_out');
+if(!(p>0)){o.textContent='Enter a price to see results.';return}
+var du=duty(p,t),loan=Math.max(p-dep,0),mort=loan>0?225.10:0,cash=dep+du.d+mort+oth;
+var h='<div class="row"><span>Transfer duty</span><b>'+f(du.d)+'</b></div><div style="font-size:12px;color:#555;padding:2px 0">'+du.n+'</div><div class="row"><span>Mortgage registration (Landgate)</span><b>'+f(mort)+'</b></div><div class="row"><span>Deposit</span><b>'+f(dep)+'</b></div><div class="row"><span>Other costs</span><b>'+f(oth)+'</b></div><div class="row"><span><b>Cash needed (excl. Landgate transfer fee)</b></span><b>'+f(cash)+'</b></div>';
+h+='<div class="row"><span>Loan amount</span><b>'+f(loan)+'</b></div><div class="row"><span>Deposit share of price</span><b>'+(dep/p*100).toFixed(1)+'%</b></div>';
+if(rate>=0&&!isNaN(rate)&&loan>0){var m=rate/1200,n=yrs*12,pay=m===0?loan/n:loan*m/(1-Math.pow(1+m,-n));h+='<div class="row"><span>Estimated monthly repayment</span><b>'+f(pay)+'</b></div><div class="row"><span>Estimated weekly repayment</span><b>'+f(pay*12/52)+'</b></div>'}
+o.innerHTML=h}
+function sell(){
+var p=parseFloat($('s_price').value),cm=parseFloat($('s_comm').value),mk=parseFloat($('s_mkt').value)||0,ln=parseFloat($('s_loan').value)||0,o=$('s_out');
+if(!(p>0)){o.textContent='Enter a price to see results.';return}
+if(isNaN(cm)){o.textContent='Enter the commission percentage to see your estimated proceeds. Your agent will confirm it in the agency agreement.';return}
+var com=p*cm/100,net=p-com-mk-ln;
+o.innerHTML='<div class="row"><span>Sale price</span><b>'+f(p)+'</b></div><div class="row"><span>Commission</span><b>'+f(com)+'</b></div><div class="row"><span>Marketing and other costs</span><b>'+f(mk)+'</b></div><div class="row"><span>Loan payout</span><b>'+f(ln)+'</b></div><div class="row"><span><b>Estimated proceeds before tax and settlement items</b></span><b>'+f(net)+'</b></div>'}
+['b_price','b_dep','b_rate','b_term','b_type','b_other'].forEach(function(i){$(i).addEventListener('input',buy);$(i).addEventListener('change',buy)});
+['s_price','s_comm','s_mkt','s_loan'].forEach(function(i){$(i).addEventListener('input',sell)});
+$('t_buy').onclick=function(){$('p_buy').style.display='';$('p_sell').style.display='none';$('t_buy').className='on';$('t_sell').className=''};
+$('t_sell').onclick=function(){$('p_buy').style.display='none';$('p_sell').style.display='';$('t_sell').className='on';$('t_buy').className=''};
+window.__dsr={duty:duty,general:general};
+})();
+</script>
