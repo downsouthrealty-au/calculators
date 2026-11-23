@@ -9,8 +9,15 @@
 <label for="b_rate">Interest rate (% a year). Use the rate your lender quotes.</label><input id="b_rate" type="number" min="0" step="0.01" inputmode="decimal">
 <label for="b_term">Loan term (years)</label><input id="b_term" type="number" min="1" max="40" step="1" value="30" inputmode="numeric">
 <label for="b_type">Buyer and property type</label><select id="b_type"><option value="g">Standard purchase of a home</option><option value="fe">First home buyer, established or new home (first home owner rate of duty)</option><option value="fv">First home buyer, vacant land (first home owner rate of duty)</option></select>
+<label for="b_new">Is the home newly built, or being built for you? (the first home owner grant is for new homes only)</label><select id="b_new"><option value="n">No, an established home</option><option value="y">Yes, new or substantially renovated</option></select>
+<label for="b_build">Building contract cost ($). Vacant land with a building contract only, used to test the grant cap. Not added to the costs below.</label><input id="b_build" type="number" min="0" step="1000" inputmode="decimal">
+<label for="b_fhog">First home owner grant amount ($). Up to $10,000, you can edit it if the amount changes.</label><input id="b_fhog" type="number" min="0" step="500" value="10000" inputmode="decimal">
+<label for="b_loc">Where is the property?</label><select id="b_loc"><option value="o">Elsewhere in WA (for example Bunbury, Busselton, Dunsborough)</option><option value="p">Perth capital city area</option></select>
+<label for="b_who">Who is buying?</label><select id="b_who"><option value="s">One buyer</option><option value="j">Two buyers (couple or joint)</option></select>
+<label for="b_inc">Yearly taxable income before tax ($). For two buyers, combined income.</label><input id="b_inc" type="number" min="0" step="1000" inputmode="decimal">
 <label for="b_other">Other costs: legal, settlement, inspections ($)</label><input id="b_other" type="number" min="0" step="100" inputmode="decimal">
 <div class="res" id="b_out" aria-live="polite">Enter a price to see results.</div>
+<div class="res" id="b_sch" aria-live="polite"></div>
 </div>
 <div id="p_sell" style="display:none">
 <label for="s_price">Expected sale price ($)</label><input id="s_price" type="number" min="0" step="1000" inputmode="decimal">
@@ -19,7 +26,7 @@
 <label for="s_loan">Loan to pay out at settlement ($)</label><input id="s_loan" type="number" min="0" step="1000" inputmode="decimal">
 <div class="res" id="s_out" aria-live="polite">Enter a price to see results.</div>
 </div>
-<small>General information only, not financial, tax or legal advice. Transfer duty uses the WA general rate (Duties Fact Sheet Residential Land, wa.gov.au, updated 5 March 2026) and the first home owner rate of duty for contracts on or after 7 May 2026 (wa.gov.au first home owner rate fact sheet, updated 27 August 2026; 2026-27 Housing Taxation Package, 23 Oct 2026). First home owner duty rates are shown only when the price is within the limits ($800,000 home, $550,000 vacant land) and you must meet the eligibility rules. Check with RevenueWA (revenue.wa.gov.au). Mortgage registration is Landgate's $225.10 fee from 1 July 2026. Landgate's transfer registration fee depends on the price and is not included: use Landgate's Transfer Lodgement Fee Calculator. The first home owner grant is not included. Repayments are principal and interest at a fixed rate, for illustration. Ask your lender for a real quote. Rates and thresholds change, last checked 23 Nov 2026.</small>
+<small>General information only, not financial, tax or legal advice. Transfer duty uses the WA general rate (Duties Fact Sheet Residential Land, wa.gov.au, updated 5 March 2026) and the first home owner rate of duty for contracts on or after 7 May 2026 (wa.gov.au first home owner rate fact sheet, updated 27 August 2026; 2026-27 Housing Taxation Package, 23 Oct 2026). First home owner duty rates are shown only when the price is within the limits ($800,000 home, $550,000 vacant land) and you must meet the eligibility rules. Check with RevenueWA (revenue.wa.gov.au). Mortgage registration is Landgate's $225.10 fee from 1 July 2026. Landgate's transfer registration fee depends on the price and is not included: use Landgate's Transfer Lodgement Fee Calculator. Grants and schemes: the first home owner grant (FHOG) is up to $10,000 for first home buyers of new homes, up to $800,000 south of the 26th parallel, no income test (wa.gov.au About the first home owner grant, updated 29 July 2026). Australian Government 5% Deposit Scheme price caps: $850,000 capital city, $600,000 other areas WA, no income cap (firsthomebuyers.gov.au, Property Price Caps and First Home Buyers pages). Help to Buy: minimum 2% deposit, Government contribution up to 40% for new homes and 30% for existing homes, income limit $103,000 single and $165,000 joint for 2026-27, same price caps (firsthomebuyers.gov.au, Help to Buy pages and 2026-27 thresholds). Keystart Low Deposit Home Loan: price limit $860,000, income limit $155,000 single and $228,000 couples and families, deposit the higher of 2% or $2,000 (keystart.com.au, 15 April 2026 product settings and Low Deposit Home Loan page). These are guides only. Your lender, Housing Australia, Keystart and RevenueWA decide eligibility, and you can use only one of the Government 5% Deposit Scheme, Help to Buy or a state loan such as Keystart at a time. Check the price cap for your suburb and postcode with the Housing Australia postcode tool. Repayments are principal and interest at a fixed rate, for illustration. Ask your lender for a real quote. Rates and thresholds change, last checked 23 Nov 2026.</small>
 </div>
 <script>
 (function(){
@@ -31,24 +38,55 @@ function duty(v,t){
 if(t==='fe'){if(v<=600000)return {d:0,n:'First home owner rate: no duty up to $600,000.'};if(v<=800000)return {d:c(v,600000,16.15),n:'First home owner concessional rate.'};return {d:general(v),n:'Over $800,000, so the general rate applies.'}}
 if(t==='fv'){if(v<=450000)return {d:0,n:'First home owner rate: no duty up to $450,000 on vacant land.'};if(v<=550000)return {d:c(v,450000,20.14),n:'First home owner concessional rate for vacant land.'};return {d:general(v),n:'Over $550,000, so the general rate applies.'}}
 return {d:general(v),n:'General rate.'}}
+function grant(p,t,nw,build,amt){
+if(t==='g')return {ok:false,n:'Not available: the grant is for first home buyers only.'};
+if(nw!=='y')return {ok:false,n:'Not available: the grant is for new homes only, not established homes.'};
+var v=p;
+if(t==='fv'){if(!(build>0))return {ok:false,n:'Enter the building contract cost to check the grant cap for vacant land.'};v=p+build}
+if(v>800000)return {ok:false,n:'Not available: total value '+f(v)+' is over the $800,000 grant cap.'};
+if(!(amt>0))return {ok:false,n:'Enter the grant amount.'};
+return {ok:true,a:amt,n:'Grant applies, subject to the first home owner rules (including living in the home for 6 months, starting within 12 months).'}}
+function schemes(p,dep,t,nw,build,loc,who,inc){
+var v=(t==='fv'&&build>0)?p+build:p,cap=loc==='p'?850000:600000,h='<div style="font-weight:bold;margin-bottom:6px">Grants and schemes check (a guide only)</div>';
+function row(name,ok,msg){return '<div style="padding:6px 0;border-bottom:1px solid #e5e5e5;font-size:14px"><b>'+name+'</b>: <span style="color:'+(ok?'#146c2e':'#a33')+'">'+(ok?'Looks eligible':'Not eligible')+'</span><div style="font-size:12px;color:#555">'+msg+'</div></div>'}
+var m=[];
+if(v>cap)m.push('price '+f(v)+' is over the '+f(cap)+' cap for this location');
+if(dep<p*0.05)m.push('deposit is under 5% of the price ('+f(p*0.05)+')');
+h+=row('Australian Government 5% Deposit Scheme',m.length===0,m.length?m.join('; ')+'. No income cap. No lenders mortgage insurance.':'Price cap '+f(cap)+', deposit at least 5%, no income cap, no lenders mortgage insurance. You must live in the home.');
+m=[];var lim=who==='j'?165000:103000;
+if(v>cap)m.push('price '+f(v)+' is over the '+f(cap)+' cap for this location');
+if(dep<p*0.02)m.push('deposit is under 2% of the price ('+f(p*0.02)+')');
+if(!(inc>0))m.push('enter your income to check the '+f(lim)+' limit');else if(inc>lim)m.push('income is over the '+f(lim)+' limit');
+var pc=nw==='y'?0.4:0.3,con=p*pc;
+h+=row('Help to Buy (shared equity)',m.length===0,m.length?m.join('; ')+'.':'Government contributes up to '+Math.round(pc*100)+'% ('+f(con)+') for '+(nw==='y'?'a new':'an existing')+' home. Loan needed with the maximum contribution: '+f(Math.max(p-dep-con,0))+'. The Government share is repaid when you sell or buy it out. Australian citizens only.');
+m=[];var kl=who==='j'?228000:155000,kd=Math.max(p*0.02,2000);
+if(p>860000)m.push('price is over the $860,000 limit');
+if(dep<kd)m.push('deposit is under '+f(kd)+' (the higher of 2% or $2,000)');
+if(!(inc>0))m.push('enter your income to check the '+f(kl)+' limit');else if(inc>kl)m.push('income is over the '+f(kl)+' limit');
+h+=row('Keystart Low Deposit Home Loan (WA)',m.length===0,m.length?m.join('; ')+'.':'Price limit $860,000, income limit '+f(kl)+', deposit '+f(kd)+', no lenders mortgage insurance. You can use the first home owner grant toward the deposit on a new build.');
+h+='<div style="font-size:12px;color:#555;padding-top:6px">Keystart also has Shared Ownership and Urban Connect loans with different limits. The First Home Super Saver Scheme lets you save up to $50,000 through super: see firsthomebuyers.gov.au. Use only one of the 5% Deposit Scheme, Help to Buy or Keystart.</div>';
+return h}
 function buy(){
-var p=parseFloat($('b_price').value),dep=parseFloat($('b_dep').value)||0,rate=parseFloat($('b_rate').value),yrs=parseFloat($('b_term').value)||30,oth=parseFloat($('b_other').value)||0,t=$('b_type').value,o=$('b_out');
-if(!(p>0)){o.textContent='Enter a price to see results.';return}
+var p=parseFloat($('b_price').value),dep=parseFloat($('b_dep').value)||0,rate=parseFloat($('b_rate').value),yrs=parseFloat($('b_term').value)||30,oth=parseFloat($('b_other').value)||0,t=$('b_type').value,o=$('b_out'),sc=$('b_sch');
+if(!(p>0)){o.textContent='Enter a price to see results.';sc.innerHTML='';return}
 var du=duty(p,t),loan=Math.max(p-dep,0),mort=loan>0?225.10:0,cash=dep+du.d+mort+oth;
+var g=grant(p,t,$('b_new').value,parseFloat($('b_build').value)||0,parseFloat($('b_fhog').value)||0),ga=g.ok?g.a:0;
 var h='<div class="row"><span>Transfer duty</span><b>'+f(du.d)+'</b></div><div style="font-size:12px;color:#555;padding:2px 0">'+du.n+'</div><div class="row"><span>Mortgage registration (Landgate)</span><b>'+f(mort)+'</b></div><div class="row"><span>Deposit</span><b>'+f(dep)+'</b></div><div class="row"><span>Other costs</span><b>'+f(oth)+'</b></div><div class="row"><span><b>Cash needed (excl. Landgate transfer fee)</b></span><b>'+f(cash)+'</b></div>';
+h+='<div class="row"><span>First home owner grant</span><b>'+(g.ok?'-'+f(ga):f(0))+'</b></div><div style="font-size:12px;color:#555;padding:2px 0">'+g.n+'</div><div class="row"><span><b>Cash needed after the grant</b></span><b>'+f(Math.max(cash-ga,0))+'</b></div>';
 h+='<div class="row"><span>Loan amount</span><b>'+f(loan)+'</b></div><div class="row"><span>Deposit share of price</span><b>'+(dep/p*100).toFixed(1)+'%</b></div>';
 if(rate>=0&&!isNaN(rate)&&loan>0){var m=rate/1200,n=yrs*12,pay=m===0?loan/n:loan*m/(1-Math.pow(1+m,-n));h+='<div class="row"><span>Estimated monthly repayment</span><b>'+f(pay)+'</b></div><div class="row"><span>Estimated weekly repayment</span><b>'+f(pay*12/52)+'</b></div>'}
-o.innerHTML=h}
+o.innerHTML=h;
+sc.innerHTML=schemes(p,dep,t,$('b_new').value,parseFloat($('b_build').value)||0,$('b_loc').value,$('b_who').value,parseFloat($('b_inc').value)||0)}
 function sell(){
 var p=parseFloat($('s_price').value),cm=parseFloat($('s_comm').value),mk=parseFloat($('s_mkt').value)||0,ln=parseFloat($('s_loan').value)||0,o=$('s_out');
 if(!(p>0)){o.textContent='Enter a price to see results.';return}
 if(isNaN(cm)){o.textContent='Enter the commission percentage to see your estimated proceeds. Your agent will confirm it in the agency agreement.';return}
 var com=p*cm/100,net=p-com-mk-ln;
 o.innerHTML='<div class="row"><span>Sale price</span><b>'+f(p)+'</b></div><div class="row"><span>Commission</span><b>'+f(com)+'</b></div><div class="row"><span>Marketing and other costs</span><b>'+f(mk)+'</b></div><div class="row"><span>Loan payout</span><b>'+f(ln)+'</b></div><div class="row"><span><b>Estimated proceeds before tax and settlement items</b></span><b>'+f(net)+'</b></div>'}
-['b_price','b_dep','b_rate','b_term','b_type','b_other'].forEach(function(i){$(i).addEventListener('input',buy);$(i).addEventListener('change',buy)});
+['b_price','b_dep','b_rate','b_term','b_type','b_other','b_new','b_build','b_fhog','b_loc','b_who','b_inc'].forEach(function(i){$(i).addEventListener('input',buy);$(i).addEventListener('change',buy)});
 ['s_price','s_comm','s_mkt','s_loan'].forEach(function(i){$(i).addEventListener('input',sell)});
 $('t_buy').onclick=function(){$('p_buy').style.display='';$('p_sell').style.display='none';$('t_buy').className='on';$('t_sell').className=''};
 $('t_sell').onclick=function(){$('p_buy').style.display='none';$('p_sell').style.display='';$('t_sell').className='on';$('t_buy').className=''};
-window.__dsr={duty:duty,general:general};
+window.__dsr={duty:duty,general:general,grant:grant};
 })();
 </script>
