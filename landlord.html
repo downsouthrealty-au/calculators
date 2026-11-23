@@ -1,0 +1,36 @@
+<!-- DownSouth Realty landlord net-return estimator. Self-contained, no external requests. Fees from DownSouth Residential PM Price List (16 Nov 2026 source, confirmed current 23 Nov 2026), GST inclusive. -->
+<div id="dsr-ll" style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;padding:16px;border:1px solid #d9d9d9;border-radius:8px;color:#222">
+<h2 style="margin-top:0">Landlord net-return estimator</h2>
+<p style="font-size:14px">Estimate what you keep from a rental after DownSouth Realty management and letting fees.</p>
+<style>#dsr-ll label{display:block;margin:10px 0 4px;font-size:14px;font-weight:bold}#dsr-ll input,#dsr-ll select{width:100%;padding:8px;font-size:16px;box-sizing:border-box}#dsr-ll .res{margin-top:16px;background:#f6f6f6;padding:12px;border-radius:6px}#dsr-ll .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e5e5e5;font-size:15px}#dsr-ll small{color:#555;font-size:12px;line-height:1.4;display:block;margin-top:10px}#dsr-ll h3{font-size:15px;margin:14px 0 4px}</style>
+<label for="l_rent">Weekly rent ($)</label><input id="l_rent" type="number" min="0" step="5" inputmode="decimal">
+<label for="l_vac">Weeks vacant per year</label><input id="l_vac" type="number" min="0" max="52" step="1" value="0" inputmode="numeric">
+<label for="l_insp">Routine inspections per year</label><input id="l_insp" type="number" min="0" max="12" step="1" value="4" inputmode="numeric">
+<label for="l_photo">Professional photography for the listing?</label><select id="l_photo"><option value="1">Yes</option><option value="0">No</option></select>
+<label for="l_ren">Lease renewals per year</label><input id="l_ren" type="number" min="0" max="4" step="1" value="1" inputmode="numeric">
+<label for="l_oth">Your other yearly costs: rates, water, insurance, repairs ($)</label><input id="l_oth" type="number" min="0" step="100" value="0" inputmode="decimal">
+<label for="l_val">Property value ($), optional, for yield</label><input id="l_val" type="number" min="0" step="1000" inputmode="decimal">
+<div class="res" id="l_out" aria-live="polite">Enter a weekly rent to see results.</div>
+<small>General information only, not financial, tax or legal advice. Fees are from the DownSouth Realty Residential PM Price List and include GST: management 8.5% of rent collected, leasing fee 1.1 weeks' rent, marketing $210, photography $200, condition report and final bond $200, lease renewal $110, routine inspection $70, admin $15 a month, annual summary $55. Letting costs (leasing, marketing, photography, condition report) are shown for a new letting in the first year only. Other fees, such as after-hours or tribunal attendance, are charged only when used and are not included. Figures are estimates, not a quote. Your management agreement sets the actual fees. Rental income is shown before tax.</small>
+</div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function f(n){return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function calc(){
+var rent=parseFloat($('l_rent').value),vac=parseFloat($('l_vac').value)||0,insp=parseFloat($('l_insp').value)||0,ph=$('l_photo').value==='1',ren=parseFloat($('l_ren').value)||0,oth=parseFloat($('l_oth').value)||0,val=parseFloat($('l_val').value),o=$('l_out');
+if(!(rent>0)){o.textContent='Enter a weekly rent to see results.';return}
+vac=Math.min(Math.max(vac,0),52);
+var gross=rent*(52-vac),mgmt=gross*0.085,admin=15*12,summ=55,ins=70*insp,rn=110*ren;
+var lease=rent*1.1,mkt=210,pho=ph?200:0,cond=200;
+var ongoing=mgmt+admin+summ+ins+rn,letting=lease+mkt+pho+cond;
+var net1=gross-ongoing-letting-oth,netOn=gross-ongoing-oth;
+var h='<div class="row"><span>Rent collected (a year)</span><b>'+f(gross)+'</b></div>';
+h+='<h3>Ongoing fees</h3><div class="row"><span>Management (8.5%)</span><b>'+f(mgmt)+'</b></div><div class="row"><span>Admin ($15 a month)</span><b>'+f(admin)+'</b></div><div class="row"><span>Annual summary</span><b>'+f(summ)+'</b></div><div class="row"><span>Routine inspections</span><b>'+f(ins)+'</b></div><div class="row"><span>Lease renewals</span><b>'+f(rn)+'</b></div>';
+h+='<h3>New letting costs (first year)</h3><div class="row"><span>Leasing fee (1.1 weeks)</span><b>'+f(lease)+'</b></div><div class="row"><span>Marketing</span><b>'+f(mkt)+'</b></div><div class="row"><span>Photography</span><b>'+f(pho)+'</b></div><div class="row"><span>Condition report and final bond</span><b>'+f(cond)+'</b></div>';
+h+='<h3>Result</h3><div class="row"><span>Your other costs</span><b>'+f(oth)+'</b></div><div class="row"><span><b>Estimated net, first year</b></span><b>'+f(net1)+'</b></div><div class="row"><span><b>Estimated net, later years (no new letting)</b></span><b>'+f(netOn)+'</b></div><div class="row"><span>Fees as share of rent collected (first year)</span><b>'+((ongoing+letting)/gross*100).toFixed(1)+'%</b></div>';
+if(val>0)h+='<div class="row"><span>Net yield on value (later years)</span><b>'+(netOn/val*100).toFixed(2)+'%</b></div>';
+o.innerHTML=h}
+['l_rent','l_vac','l_insp','l_photo','l_ren','l_oth','l_val'].forEach(function(i){$(i).addEventListener('input',calc);$(i).addEventListener('change',calc)});
+})();
+</script>
