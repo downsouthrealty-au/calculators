@@ -7,14 +7,15 @@
 <style>#dsr-comm{font-family:Karla,Arial,Helvetica,sans-serif;color:#161E2D}#dsr-comm label{display:block;margin:10px 0 4px;font-size:14px;font-weight:bold}#dsr-comm input{width:100%;padding:8px;font-size:16px;box-sizing:border-box;border:1px solid #c5ccd6;border-radius:4px;font-family:inherit}#dsr-comm input:focus{outline:2px solid #00ADEF;border-color:#00ADEF}#dsr-comm .hd{display:flex;align-items:center;gap:14px;border-bottom:3px solid #00ADEF;padding-bottom:12px;margin-bottom:14px}#dsr-comm .hd img{height:64px;width:auto;display:block}#dsr-comm .hd h2{margin:0;font-size:22px;line-height:1.2;font-weight:700}#dsr-comm .res{margin-top:16px;background:#f2f9fd;border-left:4px solid #00ADEF;padding:12px;border-radius:4px}#dsr-comm .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #dbe6ee;font-size:15px}#dsr-comm .row.big{font-size:18px;font-weight:700;border-bottom:0}#dsr-comm small{color:#525258;font-size:12px;line-height:1.4;display:block;margin-top:10px}</style>
 <label for="cm_price">Sale price ($)</label><input id="cm_price" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 650000">
 <label for="cm_pct">Commission percentage (%)</label><input id="cm_pct" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 2.5">
+<label for="cm_split">Agent share of commission (%) <span style="font-weight:400">optional</span></label><input id="cm_split" type="number" inputmode="decimal" min="0" max="100" step="any" placeholder="e.g. 50">
 <div class="res" id="cm_out" aria-live="polite"><div class="row"><span>Enter a price and percentage</span><span>-</span></div></div>
-<small>Commission = sale price x percentage. Calculation only.</small>
+<small>Commission = sale price x percentage. The split is optional: enter the agent's share and the rest goes to the agency. Calculation only.</small>
 </div>
 <script>
-(function(){var p=document.getElementById('cm_price'),c=document.getElementById('cm_pct'),o=document.getElementById('cm_out');
+(function(){var p=document.getElementById('cm_price'),c=document.getElementById('cm_pct'),sp=document.getElementById('cm_split'),o=document.getElementById('cm_out');
 function f(n){return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function u(){var v=parseFloat(p.value),r=parseFloat(c.value);if(!(v>=0)||!(r>=0)){o.innerHTML='<div class="row"><span>Enter a price and percentage</span><span>-</span></div>';return}
-var t=v*r/100;
-o.innerHTML='<div class="row big"><span>Commission</span><span>'+f(t)+'</span></div>'}
-p.addEventListener('input',u);c.addEventListener('input',u);})();
+var t=v*r/100,x=parseFloat(sp.value),extra='';if(x>=0&&x<=100){var a=t*x/100;extra='<div class="row"><span>Agent ('+x+'%)</span><span>'+f(a)+'</span></div><div class="row"><span>Agency ('+(100-x)+'%)</span><span>'+f(t-a)+'</span></div>'}
+o.innerHTML='<div class="row big"><span>Commission</span><span>'+f(t)+'</span></div>'+extra}
+p.addEventListener('input',u);c.addEventListener('input',u);sp.addEventListener('input',u);})();
 </script>
