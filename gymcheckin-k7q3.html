@@ -36,7 +36,7 @@ button{font-family:inherit;font-size:17px;min-height:50px;border-radius:25px;bor
 <h2>2. Heart rate, activity &amp; hydration</h2>
 <div class="g2"><div><label for="hrmin">Minimum HR (bpm)</label><input type="number" inputmode="decimal" id="hrmin" placeholder="Enter value"></div>
 <div><label for="hrmax">Maximum HR (bpm)</label><input type="number" inputmode="decimal" id="hrmax" placeholder="Enter value"></div>
-<div><label for="hrrest">Resting HR (bpm)</label><input type="number" inputmode="decimal" id="hrrest" placeholder="Enter value"></div>
+<div><label for="hrrest">Resting HR (bpm)</label><input type="text" id="hrrest" placeholder="e.g. 63 or 61-68"></div>
 <div><label for="steps">Average daily steps</label><input type="number" inputmode="decimal" id="steps" placeholder="Enter value"></div>
 <div><label for="fluids">Average fluids (litres/day)</label><input type="number" inputmode="decimal" step="any" id="fluids" placeholder="Enter value"></div></div>
 <label for="hrctx">Heart rate context</label><input type="text" id="hrctx" placeholder="e.g. minimum during sleep, maximum during gym">
@@ -50,10 +50,12 @@ button{font-family:inherit;font-size:17px;min-height:50px;border-radius:25px;bor
 <div class="lb">Calorie cycling status</div>
 <label class="opt"><input type="radio" name="cyc" value="Paused">Paused</label><label class="opt"><input type="radio" name="cyc" value="Still cycling">Still cycling</label><label class="opt"><input type="radio" name="cyc" value="Eating flexibly">Eating flexibly</label>
 <div class="g2"><div><label for="tgoal">Training-day goal</label><input type="text" id="tgoal" placeholder="If applicable"></div><div><label for="rgoal">Rest-day goal</label><input type="text" id="rgoal" placeholder="If applicable"></div></div>
-<label for="fast">Fasting status</label><select id="fast"><option value="">Select if applicable</option><option>Not fasting</option><option>Intermittent fasting</option><option>Extended fast this week</option><option>Other (see notes)</option></select>
+<label for="fast">Fasting status</label><select id="fast"><option value="">Select if applicable</option><option>Not fasting</option><option>Stopped</option><option>Intermittent fasting</option><option>Extended fast this week</option><option>Other (see notes)</option></select>
 <div class="lb">How has food-related anxiety or the urge to compensate been?</div>
 <label class="opt"><input type="radio" name="anx" value="None this week">None this week</label><label class="opt"><input type="radio" name="anx" value="Mild">Mild</label><label class="opt"><input type="radio" name="anx" value="Moderate">Moderate</label><label class="opt"><input type="radio" name="anx" value="Strong / frequent">Strong / frequent</label><label class="opt"><input type="radio" name="anx" value="Prefer not to say">Prefer not to say</label>
 <label for="nnotes">Nutrition notes</label><textarea id="nnotes" placeholder="Meal consistency, fibre sources, appetite, food concerns..."></textarea>
+<label for="supp">Supplements (not tracked in MyFitnessPal)</label><textarea id="supp" placeholder="e.g. electrolytes, magnesium, fibre gummies, fish oil, iron"></textarea>
+<label for="diary">MyFitnessPal diary notes</label><textarea id="diary" placeholder="Paste the daily food diary from MyFitnessPal (optional)"></textarea>
 <hr>
 <h2>4. Training &mdash; Strong workouts</h2>
 <div class="g2"><div><label for="wk">Workouts completed</label><input type="number" inputmode="numeric" id="wk" placeholder="e.g. 2"></div>
@@ -62,6 +64,7 @@ button{font-family:inherit;font-size:17px;min-height:50px;border-radius:25px;bor
 <label class="opt"><input type="radio" name="rtt" value="Taking a recovery break">Taking a recovery break</label><label class="opt"><input type="radio" name="rtt" value="Light training">Light training</label><label class="opt"><input type="radio" name="rtt" value="Returned to normal training">Returned to normal training</label>
 <p class="note" style="margin-top:12px">Paste workout records from Strong. Leave unused workout fields blank.</p>
 <div id="wos"></div>
+<label for="wnote">Workout notes</label><textarea id="wnote" placeholder="Template changes, weight adjustments, exercises struggling with, treadmill incline, etc."></textarea>
 <label for="wadd">Additional workouts</label><textarea id="wadd" placeholder="Optional"></textarea>
 <hr>
 <h2>5. Recovery &amp; sleep</h2>
@@ -107,10 +110,12 @@ function rv(n){var e=document.querySelector('input[name='+n+']:checked');return 
 function ln(l,v,u){return v!==''&&v!=null?'- '+l+': '+v+(u?' '+u:'')+'\n':''}
 function build(){var s='WEEKLY FITNESS CHECK-IN\nDate: '+$('date').value+'\n\n1. BODY MEASUREMENTS (average of 2 readings)\n';
 M.forEach(function(m,i){var v=avg(i),a=$('a'+i).value,b=$('b'+i).value;if(v!=null)s+='- '+m[0]+': '+(Math.round(v*10)/10)+' '+m[1]+' (readings: '+(a||'-')+', '+(b||'-')+')\n'});
-s+='\n2. HEART RATE, ACTIVITY & HYDRATION\n'+ln('Minimum HR',$('hrmin').value,'bpm')+ln('Maximum HR',$('hrmax').value,'bpm')+ln('Resting HR',$('hrrest').value,'bpm')+ln('Average daily steps',$('steps').value)+ln('Average fluids',$('fluids').value,'L/day')+ln('HR context',$('hrctx').value.trim());
-s+='\n3. NUTRITION (MyFitnessPal daily averages)\n'+ln('Calories',$('cal').value,'kcal')+ln('Protein',$('pro').value,'g')+ln('Carbs',$('carb').value,'g')+ln('Fat',$('fat').value,'g')+ln('Fibre',$('fib').value,'g')+ln('Calorie cycling',rv('cyc'))+ln('Training-day goal',$('tgoal').value.trim())+ln('Rest-day goal',$('rgoal').value.trim())+ln('Fasting',$('fast').value)+ln('Food anxiety / urge to compensate',rv('anx'))+ln('Notes',$('nnotes').value.trim());
+s+='\n2. HEART RATE, ACTIVITY & HYDRATION\n'+ln('Minimum HR',$('hrmin').value,'bpm')+ln('Maximum HR',$('hrmax').value,'bpm')+ln('Resting HR',$('hrrest').value.trim(),'bpm')+ln('Average daily steps',$('steps').value)+ln('Average fluids',$('fluids').value,'L/day')+ln('HR context',$('hrctx').value.trim());
+s+='\n3. NUTRITION (MyFitnessPal daily averages)\n'+ln('Calories',$('cal').value,'kcal')+ln('Protein',$('pro').value,'g')+ln('Carbs',$('carb').value,'g')+ln('Fat',$('fat').value,'g')+ln('Fibre',$('fib').value,'g')+ln('Calorie cycling',rv('cyc'))+ln('Training-day goal',$('tgoal').value.trim())+ln('Rest-day goal',$('rgoal').value.trim())+ln('Fasting',$('fast').value)+ln('Food anxiety / urge to compensate',rv('anx'))+ln('Notes',$('nnotes').value.trim())+ln('Supplements',$('supp').value.trim());
+if($('diary').value.trim())s+='\nMyFitnessPal diary notes:\n'+$('diary').value.trim()+'\n';
 s+='\n4. TRAINING (Strong)\n'+ln('Workouts completed',$('wk').value)+ln('Overall strength',$('str').value)+ln('Return-to-training status',rv('rtt'));
 for(var i=0;i<W;i++){var t=$('w'+i).value.trim();if(t)s+='\nWorkout '+(i+1)+':\n'+t+'\n'}
+if($('wnote').value.trim())s+='\nWorkout notes:\n'+$('wnote').value.trim()+'\n';
 if($('wadd').value.trim())s+='\nAdditional workouts:\n'+$('wadd').value.trim()+'\n';
 s+='\n5. RECOVERY & SLEEP\n'+ln('Physical energy',sv('energy'))+ln('Hunger',sv('hunger'))+ln('Sleep quality',sv('sleepq'))+ln('Average sleep duration',$('sleepd').value.trim())+ln('Soreness / recovery',$('sore').value.trim())+ln('Chest symptoms since medical clearance',rv('chest'));
 s+='\n6. STRESS & MENTAL WELLBEING\n'+ln('Stress level',sv('stress'))+ln('Mental energy / motivation',sv('mental'))+ln('How often stressed',rv('sfreq'))+ln('Main sources of stress',cks('src'))+ln('Enjoyment of everyday activities',rv('enj'))+ln('Wellbeing notes',$('wnotes').value.trim());
