@@ -20,115 +20,61 @@ input::placeholder,textarea::placeholder{color:#8a8a8a}input[type=date]{color-sc
 input[type=range]{width:100%;accent-color:#fff;height:36px;margin:2px 0}.sh{display:flex;justify-content:space-between;color:#a8a8a8;font-size:15px}.sr{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;color:#cfcfcf}.sr b{color:#f2f2f2;font-weight:600}
 .opt input{appearance:none;-webkit-appearance:none;width:24px;height:24px;border:2px solid #777;border-radius:50%;margin:0;flex:none}
 .opt input:checked{border-color:#fff;background:radial-gradient(#fff 45%,transparent 50%)}
-button{font-family:inherit;font-size:17px;min-height:50px;border-radius:25px;border:0;padding:0 22px;cursor:pointer}
-.pri{background:#fff;color:#000;font-weight:600;width:100%;margin-top:8px}.sec{background:#242424;color:#fff;width:100%;margin-top:10px}
-#out{display:none;margin-top:18px}#sum{white-space:pre-wrap;background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:14px;font-size:14px;font-family:ui-monospace,Menlo,monospace;color:#e6e6e6}
-#msg{color:#8fd18f;min-height:22px;margin-top:8px}
-</style></head><body><div class="card">
-<h1>Weekly Trainer Check-In</h1><p class="sub">Report in, stay accountable. Straight numbers, honest notes. Your trainer reviews it and sets next week.</p>
-<label for="date">Check-in date</label><input type="date" id="date">
-<hr>
-<h2>1. Weigh-in &amp; measurements</h2><p class="note">Two readings each, same conditions as last time. Averages calculate for you.</p>
-<div class="mh"><span>Measurement</span><span>Reading 1</span><span>Reading 2</span></div>
-<div id="meas"></div>
-<div class="avg"><h3>Calculated averages</h3><div class="g2" id="avgs"></div></div>
-<hr>
-<h2>2. Heart rate, steps &amp; hydration</h2>
-<div class="g2"><div><label for="hrmin">Minimum HR (bpm)</label><input type="number" inputmode="decimal" id="hrmin" placeholder="Enter value"></div>
-<div><label for="hrmax">Maximum HR (bpm)</label><input type="number" inputmode="decimal" id="hrmax" placeholder="Enter value"></div>
-<div><label for="hrrest">Resting HR (bpm)</label><input type="text" id="hrrest" placeholder="e.g. 63 or 61-68"></div>
-<div><label for="steps">Average daily steps</label><input type="number" inputmode="decimal" id="steps" placeholder="Enter value"></div>
-<div><label for="fluids">Average fluids (litres/day)</label><input type="number" inputmode="decimal" step="any" id="fluids" placeholder="Enter value"></div></div>
-<label for="hrctx">Heart rate context</label><input type="text" id="hrctx" placeholder="e.g. minimum during sleep, maximum during gym">
-<hr>
-<h2>3. Nutrition: did you hit your targets?</h2><p class="note">Your MyFitnessPal daily averages for the week. Be honest, skipped fields are fine.</p>
-<div class="g2"><div><label for="cal">Calories (kcal)</label><input type="number" inputmode="decimal" id="cal" placeholder="Daily average"></div>
-<div><label for="pro">Protein (g)</label><input type="number" inputmode="decimal" id="pro" placeholder="Daily average"></div>
-<div><label for="carb">Carbs (g)</label><input type="number" inputmode="decimal" id="carb" placeholder="Daily average"></div>
-<div><label for="fat">Fat (g)</label><input type="number" inputmode="decimal" id="fat" placeholder="Daily average"></div>
-<div><label for="fib">Fibre (g)</label><input type="number" inputmode="decimal" id="fib" placeholder="Daily average"></div></div>
-<div class="lb">Calorie cycling status</div>
-<label class="opt"><input type="radio" name="cyc" value="Paused">Paused</label><label class="opt"><input type="radio" name="cyc" value="Still cycling">Still cycling</label><label class="opt"><input type="radio" name="cyc" value="Eating flexibly">Eating flexibly</label>
-<div class="g2"><div><label for="tgoal">Training-day goal</label><input type="text" id="tgoal" placeholder="If applicable"></div><div><label for="rgoal">Rest-day goal</label><input type="text" id="rgoal" placeholder="If applicable"></div></div>
-<label for="fast">Fasting status</label><select id="fast"><option value="">Select if applicable</option><option>Not fasting</option><option>Stopped</option><option>Intermittent fasting</option><option>Extended fast this week</option><option>Other (see notes)</option></select>
-<div class="lb">How has food-related anxiety or the urge to compensate been?</div>
-<label class="opt"><input type="radio" name="anx" value="None this week">None this week</label><label class="opt"><input type="radio" name="anx" value="Mild">Mild</label><label class="opt"><input type="radio" name="anx" value="Moderate">Moderate</label><label class="opt"><input type="radio" name="anx" value="Strong / frequent">Strong / frequent</label><label class="opt"><input type="radio" name="anx" value="Prefer not to say">Prefer not to say</label>
-<label for="pdays">Days hitting protein target (out of 7)</label><select id="pdays"><option value="">Select</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
-<label for="nnotes">Nutrition notes</label><textarea id="nnotes" placeholder="Meal consistency, fibre sources, appetite, food concerns..."></textarea>
-<label for="supp">Supplements (not tracked in MyFitnessPal)</label><textarea id="supp" placeholder="e.g. electrolytes, magnesium, fibre gummies, fish oil, iron"></textarea>
-<label for="diary">MyFitnessPal diary notes</label><textarea id="diary" placeholder="Paste the daily food diary from MyFitnessPal (optional)"></textarea>
-<hr>
-<h2>4. Training: what did you get done?</h2>
-<div class="g2"><div><label for="wk">Workouts completed</label><input type="number" inputmode="numeric" id="wk" placeholder="e.g. 2"></div>
-<div><label for="str">Overall strength</label><select id="str"><option value="">Select</option><option>Stronger</option><option>About the same</option><option>Weaker</option><option>Not sure</option></select></div></div>
-<div class="lb">Return-to-training status</div>
-<label class="opt"><input type="radio" name="rtt" value="Taking a recovery break">Taking a recovery break</label><label class="opt"><input type="radio" name="rtt" value="Light training">Light training</label><label class="opt"><input type="radio" name="rtt" value="Returned to normal training">Returned to normal training</label>
-<p class="note" style="margin-top:12px">Paste workout records from Strong. Leave unused workout fields blank.</p>
-<div id="wos"></div>
-<label for="prs">PRs from Strong this week (which lifts moved)</label><textarea id="prs" placeholder="e.g. Hack squat 30 kg x 12, lat pulldown 80 kg x 11. Write 'None' if no PRs."></textarea>
-<label for="wnote">Workout notes</label><textarea id="wnote" placeholder="Template changes, weight adjustments, exercises struggling with, treadmill incline, etc."></textarea>
-<label for="wadd">Additional workouts</label><textarea id="wadd" placeholder="Optional"></textarea>
-<hr>
-<h2>5. Recovery &amp; sleep: how did your body hold up?</h2>
-<div id="sl1"></div>
-<label for="sleepd">Average sleep duration</label><input type="text" id="sleepd" placeholder="e.g. 7 hours, interrupted">
-<label for="sore">Soreness / recovery notes</label><textarea id="sore" placeholder="Any fatigue, soreness or aches?"></textarea>
-<div class="lb">Any chest symptoms since medical clearance?</div>
-<label class="opt"><input type="radio" name="chest" value="No symptoms">No symptoms</label><label class="opt"><input type="radio" name="chest" value="Symptoms returned">Symptoms returned</label><label class="opt"><input type="radio" name="chest" value="Prefer not to say">Prefer not to say</label>
-<p class="note">If unexplained chest pain returns, stop exercising and seek medical advice. For ongoing or concerning chest pain, call 000.</p>
-<hr>
-<h2>6. Stress &amp; mindset</h2>
-<div id="sl2"></div>
-<div class="lb">How often have you felt stressed?</div>
-<label class="opt"><input type="radio" name="sfreq" value="Rarely">Rarely</label><label class="opt"><input type="radio" name="sfreq" value="Some days">Some days</label><label class="opt"><input type="radio" name="sfreq" value="Most days">Most days</label><label class="opt"><input type="radio" name="sfreq" value="Every day">Every day</label>
-<div class="lb">Main sources of stress</div>
-<label class="opt"><input type="checkbox" class="ck" name="src" value="Work">Work</label><label class="opt"><input type="checkbox" class="ck" name="src" value="Personal life">Personal life</label><label class="opt"><input type="checkbox" class="ck" name="src" value="Sleep">Sleep</label><label class="opt"><input type="checkbox" class="ck" name="src" value="Training / recovery">Training / recovery</label><label class="opt"><input type="checkbox" class="ck" name="src" value="Nutrition / food">Nutrition / food</label><label class="opt"><input type="checkbox" class="ck" name="src" value="Other">Other</label>
-<div class="lb">Enjoyment of everyday activities</div>
-<label class="opt"><input type="radio" name="enj" value="Enjoying things as usual">Enjoying things as usual</label><label class="opt"><input type="radio" name="enj" value="Slightly less enjoyment">Slightly less enjoyment</label><label class="opt"><input type="radio" name="enj" value="Significantly less enjoyment">Significantly less enjoyment</label>
-<label for="wnotes">Wellbeing notes</label><textarea id="wnotes" placeholder="What's been stressful or helpful this week?"></textarea>
-<hr>
-<h2>7. Wrap-up &amp; next week</h2>
-<label for="focus">Next week's focus (one line)</label><input type="text" id="focus" maxlength="140" placeholder="e.g. Hit protein every day, add fibre">
-<div class="lb" style="margin-top:12px">Anything else for your trainer?</div>
-<textarea id="tnotes" aria-label="Anything else" placeholder="Wins, struggles, questions for your trainer..."></textarea>
-<button class="pri" id="make">Build my check-in report</button>
-<p class="note" style="text-align:center;margin-top:12px">Nothing is sent or saved on this page. It builds your report for you to copy and send to your trainer. All fields are optional.</p>
-<div id="out"><div id="sum"></div><button class="pri" id="copy">Copy report</button><button class="sec" id="share">Share</button><div id="msg" aria-live="polite"></div></div>
-</div>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Weekly check-in</title>
+<style>
+:root{--bg:#0e1116;--card:#171b22;--line:#262c36;--tx:#e8ecf2;--mut:#8b94a3;--ac:#4cc38a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,system-ui,sans-serif;padding:16px 14px 90px;max-width:560px;margin:auto}
+h1{font-size:22px;margin:6px 0 2px}p.s{color:var(--mut);margin:0 0 14px;font-size:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin:0 0 10px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{width:100%;background:#0e1116;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:16px}
+textarea{min-height:90px}.r{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end}
+.r .a{font-size:13px;color:var(--ac);padding-bottom:12px;text-align:center}.m{font-size:14px;margin-top:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#0e1116ee;border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;max-width:560px;margin:auto}
+button{flex:1;background:var(--ac);color:#062014;border:0;border-radius:10px;padding:13px;font-size:16px;font-weight:600}button.g{background:#262c36;color:var(--tx)}
+pre{white-space:pre-wrap;background:#0e1116;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;display:none}
+</style></head><body>
+<h1>Weekly check-in</h1><p class="s">Fill in, tap Summary, send it to Instinct for feedback. Saves on this phone as you type.</p>
+<div id="app"></div><pre id="out"></pre>
+<div class="bar"><button class="g" id="clr">Clear</button><button id="sum">Summary</button></div>
 <script>
-var M=[["Weight","kg"],["Waist","cm"],["Chest","cm"],["Left bicep","cm"],["Left calf","cm"]],$=function(i){return document.getElementById(i)};
-$('meas').innerHTML=M.map(function(m,i){return '<div class="mrow"><div class="n"><b>'+m[0]+'</b><span>'+m[1]+'</span></div><input type="number" inputmode="decimal" step="any" id="a'+i+'" placeholder="0" aria-label="'+m[0]+' reading 1"><input type="number" inputmode="decimal" step="any" id="b'+i+'" placeholder="0" aria-label="'+m[0]+' reading 2"></div>'}).join('');
-$('avgs').innerHTML=M.map(function(m,i){return '<div><small>'+m[0]+'</small><strong id="v'+i+'">\u2014</strong></div>'}).join('');
-var W=4;$('wos').innerHTML=Array.apply(null,Array(W)).map(function(_,i){return '<label for="w'+i+'">Workout '+(i+1)+'</label><textarea id="w'+i+'" placeholder="Paste Strong workout '+(i+1)+'..."></textarea>'}).join('');
-
-var SL=[['sl1',[['energy','Physical energy','Very drained','Excellent'],['hunger','Hunger','Very low','Very hungry'],['sleepq','Sleep quality','Very poor','Excellent']]],['sl2',[['stress','Stress level','Very relaxed','Extremely stressed'],['mental','Mental energy / motivation','Very drained','Excellent']]]];
-var SK=[];SL.forEach(function(g){$(g[0]).innerHTML=g[1].map(function(x){SK.push(x);return '<div class="sr"><span>'+x[1]+'</span><b id="o_'+x[0]+'">\u2014/10</b></div><input type="range" min="1" max="10" step="1" id="r_'+x[0]+'" data-set="0" aria-label="'+x[1]+'"><div class="sh"><span>'+x[2]+'</span><span>'+x[3]+'</span></div>'}).join('')});
-SK.forEach(function(x){var r=$('r_'+x[0]);r.value=5;r.addEventListener('input',function(){r.dataset.set='1';$('o_'+x[0]).textContent=r.value+'/10'})});
-function sv(k){var r=$('r_'+k);return r.dataset.set==='1'?r.value+'/10':''}
-function cks(n){return Array.prototype.map.call(document.querySelectorAll('input[name='+n+']:checked'),function(e){return e.value}).join(', ')}
-var d=new Date();$('date').value=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
-function avg(i){var a=parseFloat($('a'+i).value),b=parseFloat($('b'+i).value),v=[a,b].filter(function(x){return !isNaN(x)&&x>0});return v.length?v.reduce(function(s,x){return s+x},0)/v.length:null}
-function upd(){M.forEach(function(m,i){var v=avg(i);$('v'+i).textContent=v==null?'\u2014':(Math.round(v*10)/10)+' '+m[1]})}
-document.addEventListener('input',upd);
-function rv(n){var e=document.querySelector('input[name='+n+']:checked');return e?e.value:''}
-function ln(l,v,u){return v!==''&&v!=null?'- '+l+': '+v+(u?' '+u:'')+'\n':''}
-function build(){var s='WEEKLY CHECK-IN FOR MY TRAINER\nDate: '+$('date').value+'\n\n1. WEIGH-IN & MEASUREMENTS (average of 2 readings)\n';
-M.forEach(function(m,i){var v=avg(i),a=$('a'+i).value,b=$('b'+i).value;if(v!=null)s+='- '+m[0]+': '+(Math.round(v*10)/10)+' '+m[1]+' (readings: '+(a||'-')+', '+(b||'-')+')\n'});
-s+='\n2. HEART RATE, ACTIVITY & HYDRATION\n'+ln('Minimum HR',$('hrmin').value,'bpm')+ln('Maximum HR',$('hrmax').value,'bpm')+ln('Resting HR',$('hrrest').value.trim(),'bpm')+ln('Average daily steps',$('steps').value)+ln('Average fluids',$('fluids').value,'L/day')+ln('HR context',$('hrctx').value.trim());
-s+='\n3. NUTRITION (MyFitnessPal daily averages)\n'+ln('Calories',$('cal').value,'kcal')+ln('Protein',$('pro').value,'g')+ln('Carbs',$('carb').value,'g')+ln('Fat',$('fat').value,'g')+ln('Days hitting protein target',$('pdays').value?$('pdays').value+'/7':'')+ln('Fibre',$('fib').value,'g')+ln('Calorie cycling',rv('cyc'))+ln('Training-day goal',$('tgoal').value.trim())+ln('Rest-day goal',$('rgoal').value.trim())+ln('Fasting',$('fast').value)+ln('Food anxiety / urge to compensate',rv('anx'))+ln('Notes',$('nnotes').value.trim())+ln('Supplements',$('supp').value.trim());
-if($('diary').value.trim())s+='\nMyFitnessPal diary notes:\n'+$('diary').value.trim()+'\n';
-s+='\n4. TRAINING (Strong)\n'+ln('Workouts completed',$('wk').value)+ln('Overall strength',$('str').value)+ln('Return-to-training status',rv('rtt'));
-for(var i=0;i<W;i++){var t=$('w'+i).value.trim();if(t)s+='\nWorkout '+(i+1)+':\n'+t+'\n'}
-if($('prs').value.trim())s+='\nPRs from Strong this week:\n'+$('prs').value.trim()+'\n';
-if($('wnote').value.trim())s+='\nWorkout notes:\n'+$('wnote').value.trim()+'\n';
-if($('wadd').value.trim())s+='\nAdditional workouts:\n'+$('wadd').value.trim()+'\n';
-s+='\n5. RECOVERY & SLEEP\n'+ln('Physical energy',sv('energy'))+ln('Hunger',sv('hunger'))+ln('Sleep quality',sv('sleepq'))+ln('Average sleep duration',$('sleepd').value.trim())+ln('Soreness / recovery',$('sore').value.trim())+ln('Chest symptoms since medical clearance',rv('chest'));
-s+='\n6. STRESS & MENTAL WELLBEING\n'+ln('Stress level',sv('stress'))+ln('Mental energy / motivation',sv('mental'))+ln('How often stressed',rv('sfreq'))+ln('Main sources of stress',cks('src'))+ln('Enjoyment of everyday activities',rv('enj'))+ln('Wellbeing notes',$('wnotes').value.trim());
-s+='\n7. WRAP-UP & NEXT WEEK\n'+ln('Next week\'s focus',$('focus').value.trim());
-if($('tnotes').value.trim())s+='\nAnything else:\n'+$('tnotes').value.trim()+'\n';
-return s.replace(/\n{3,}/g,'\n\n').trim()}
-$('make').onclick=function(){$('sum').textContent=build();$('out').style.display='block';$('out').scrollIntoView({behavior:'smooth'})};
-$('copy').onclick=function(){var t=$('sum').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){$('msg').textContent='Copied. Paste it into your message.'},function(){var r=document.createRange();r.selectNodeContents($('sum'));var s=getSelection();s.removeAllRanges();s.addRange(r);$('msg').textContent='Text selected. Use Copy on your phone.'})};
-$('share').onclick=function(){var t=$('sum').textContent;if(navigator.share){navigator.share({text:t}).catch(function(){})}else{$('msg').textContent='Share is not available here. Use Copy.'}};
-upd();
+const $=s=>document.querySelector(s);const F={};
+const meas=[["Weight","kg"],["Waist","cm"],["Chest","cm"],["Left bicep","cm"],["Left calf","cm"]];
+const sc=n=>`<select id="${n}"><option value="">-</option>${[...Array(10)].map((_,i)=>`<option>${i+1}</option>`).join("")}</select>`;
+const tx=(n,l,t="text")=>`<label>${l}</label><input id="${n}" type="${t}" inputmode="${t=='number'?'decimal':'text'}">`;
+const ta=(n,l)=>`<label>${l}</label><textarea id="${n}"></textarea>`;
+const op=(n,l,o)=>`<label>${l}</label><select id="${n}"><option value="">-</option>${o.map(x=>`<option>${x}</option>`).join("")}</select>`;
+let h=`<section><h2>Date</h2><input id="date" type="date"></section>`;
+h+=`<section><h2>1. Weigh-in &amp; measurements</h2>`+meas.map(([n,u],i)=>`<label>${n} (${u})</label><div class="r"><input id="m${i}a" type="number" step="any" inputmode="decimal" placeholder="Read 1"><input id="m${i}b" type="number" step="any" inputmode="decimal" placeholder="Read 2"><div class="a" id="m${i}v">avg -</div></div>`).join("")+`</section>`;
+h+=`<section><h2>2. Heart rate, activity &amp; hydration</h2>${tx("hrmin","Minimum HR (bpm)","number")}${tx("hrmax","Maximum HR (bpm)","number")}${tx("hrrest","Resting HR (bpm or range)")}${tx("steps","Average daily steps","number")}${tx("fluid","Average fluids (L/day)","number")}</section>`;
+h+=`<section><h2>3. Nutrition (MyFitnessPal daily averages)</h2><div class="m" style="color:var(--mut)">Targets: 1800 kcal, 135 g carbs, 70 g fat, 158 g protein</div>${tx("cal","Calories (kcal)","number")}${tx("pro","Protein (g)","number")}${tx("carb","Carbs (g)","number")}${tx("fat","Fat (g)","number")}${tx("protdays","Days hitting protein target (of 7)","number")}${tx("fibre","Fibre (g)","number")}${op("cyc","Calorie cycling",["Eating flexibly","Strict cycling","Not cycling"])}${op("fast","Fasting",["Not fasting","Intermittent fasting","Extended fast"])}${op("anx","Food anxiety / urge to compensate",["None this week","Mild","Moderate","Strong"])}${tx("supp","Supplements","text")}${ta("mfp","MyFitnessPal diary notes (paste if you want)")}</section>`;
+h+=`<section><h2>4. Training (Strong)</h2>${tx("wk","Workouts completed","number")}${op("str","Overall strength",["Stronger","About the same","Weaker"])}${op("ret","Return-to-training status",["Returned to normal training","Returning gradually","Not training"])}${ta("wo","Paste Strong workouts (all of them)")}${ta("prs","PRs from Strong this week")}${ta("won","Workout notes")}</section>`;
+h+=`<section><h2>5. Recovery &amp; sleep</h2><label>Physical energy /10</label>${sc("en")}<label>Hunger /10</label>${sc("hun")}<label>Sleep quality /10</label>${sc("sq")}${tx("sd","Average sleep duration (hours)")}${ta("sore","Soreness / recovery")}${op("chest","Chest symptoms since medical clearance",["No symptoms","Mild symptoms","Symptoms - need advice"])}</section>`;
+h+=`<section><h2>6. Stress &amp; mental wellbeing</h2><label>Stress level /10</label>${sc("st")}<label>Mental energy / motivation /10</label>${sc("me")}${op("how","How often stressed",["Rarely","Some days","Most days","Every day"])}${tx("src","Main sources of stress")}${op("enj","Enjoyment of everyday activities",["Enjoying things as usual","A bit less","Much less"])}</section>`;
+h+=`<section><h2>7. Wrap-up &amp; next week</h2>${tx("focus","Next week's focus")}${ta("extra","Anything else for Instinct")}</section>`;
+$("#app").innerHTML=h;
+const ids=[...document.querySelectorAll("input,select,textarea")];
+const KEY="ds_gym_checkin";let S={};try{S=JSON.parse(localStorage[KEY]||"{}")}catch(e){}
+if(!S.date){S.date=new Date().toLocaleDateString("en-CA")}
+ids.forEach(e=>{if(S[e.id]!=null)e.value=S[e.id];e.addEventListener("input",()=>{S[e.id]=e.value;localStorage[KEY]=JSON.stringify(S);avg()})});
+function v(i){return $("#"+i).value.trim()}
+function avg(){meas.forEach((_,i)=>{const a=parseFloat(v("m"+i+"a")),b=parseFloat(v("m"+i+"b"));const x=[a,b].filter(n=>!isNaN(n));$("#m"+i+"v").textContent=x.length?"avg "+(x.reduce((p,c)=>p+c)/x.length).toFixed(1).replace(/\.0$/,""):"avg -"})}
+avg();
+const L=(k,x,u="")=>x?`- ${k}: ${x}${u}\n`:"";
+function build(){let t=`WEEKLY CHECK-IN FOR MY TRAINER\nDate: ${v("date")}\n\n1. WEIGH-IN & MEASUREMENTS (average of 2 readings)\n`;
+meas.forEach(([n,u],i)=>{const a=v("m"+i+"a"),b=v("m"+i+"b");const x=[a,b].map(parseFloat).filter(n=>!isNaN(n));if(x.length)t+=`- ${n}: ${(x.reduce((p,c)=>p+c)/x.length).toFixed(1).replace(/\.0$/,"")} ${u} (readings: ${[a,b].filter(Boolean).join(", ")})\n`});
+t+=`\n2. HEART RATE, ACTIVITY & HYDRATION\n`+L("Minimum HR",v("hrmin")," bpm")+L("Maximum HR",v("hrmax")," bpm")+L("Resting HR",v("hrrest")," bpm")+L("Average daily steps",v("steps"))+L("Average fluids",v("fluid")," L/day");
+t+=`\n3. NUTRITION (MyFitnessPal daily averages)\n`+L("Calories",v("cal")," kcal")+L("Protein",v("pro")," g")+L("Carbs",v("carb")," g")+L("Fat",v("fat")," g")+L("Days hitting protein target",v("protdays")?v("protdays")+"/7":"")+L("Fibre",v("fibre")," g")+L("Calorie cycling",v("cyc"))+L("Fasting",v("fast"))+L("Food anxiety / urge to compensate",v("anx"))+L("Supplements",v("supp"));
+if(v("mfp"))t+=`\nMyFitnessPal diary notes:\n${v("mfp")}\n`;
+t+=`\n4. TRAINING (Strong)\n`+L("Workouts completed",v("wk"))+L("Overall strength",v("str"))+L("Return-to-training status",v("ret"));
+if(v("wo"))t+=`\n${v("wo")}\n`;
+if(v("prs"))t+=`\nPRs from Strong this week:\n${v("prs")}\n`;
+if(v("won"))t+=`\nWorkout notes:\n${v("won")}\n`;
+t+=`\n5. RECOVERY & SLEEP\n`+L("Physical energy",v("en"),"/10")+L("Hunger",v("hun"),"/10")+L("Sleep quality",v("sq"),"/10")+L("Average sleep duration",v("sd")," Hours")+L("Soreness / recovery",v("sore"))+L("Chest symptoms since medical clearance",v("chest"));
+t+=`\n6. STRESS & MENTAL WELLBEING\n`+L("Stress level",v("st"),"/10")+L("Mental energy / motivation",v("me"),"/10")+L("How often stressed",v("how"))+L("Main sources of stress",v("src"))+L("Enjoyment of everyday activities",v("enj"));
+t+=`\n7. WRAP-UP & NEXT WEEK\n`+L("Next week's focus",v("focus"))+L("Anything else",v("extra"));return t}
+$("#sum").onclick=async()=>{const t=build(),o=$("#out");o.textContent=t;o.style.display="block";o.scrollIntoView({behavior:"smooth"});
+try{await navigator.clipboard.writeText(t);$("#sum").textContent="Copied - paste to Instinct"}catch(e){$("#sum").textContent="Select and copy above"}setTimeout(()=>$("#sum").textContent="Summary",3500)};
+$("#clr").onclick=()=>{if(confirm("Clear the form?")){localStorage.removeItem(KEY);location.reload()}};
 </script></body></html>
