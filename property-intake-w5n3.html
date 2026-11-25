@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Property features</title>
+<style>
+:root{--bg:#0e1116;--card:#171b22;--line:#262c36;--tx:#e8ecf2;--mut:#8b94a3;--ac:#4cc38a}
+*{box-sizing:border-box}body{margin:0 auto;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,system-ui,sans-serif;padding:16px 14px 90px;max-width:560px}
+h1{font-size:22px;margin:6px 0 2px}p.s{color:var(--mut);margin:0 0 14px;font-size:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin:0 0 6px}
+h3{font-size:13px;color:var(--mut);margin:14px 0 4px;font-weight:600}
+label.l{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:#0e1116;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:16px;font-family:inherit}
+textarea{min-height:80px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chips label{display:inline-flex;align-items:center;gap:6px;background:#0e1116;border:1px solid var(--line);border-radius:20px;padding:8px 12px;font-size:14px}
+.chips input{width:18px;height:18px;accent-color:var(--ac)}
+.chips label:has(input:checked){border-color:var(--ac);color:var(--ac)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#0e1116ee;border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;max-width:560px;margin:auto}
+button{flex:1;background:var(--ac);color:#062014;border:0;border-radius:10px;padding:13px;font-size:16px;font-weight:600}button.g{background:#262c36;color:var(--tx)}
+pre{white-space:pre-wrap;background:#0e1116;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;display:none}
+.hide{display:none}
+</style></head><body>
+<h1>Property features</h1><p class="s">Pick what it is listed as, fill in what you know, tap Summary and send it for the write-up. Saves on this phone as you type.</p>
+<section><h2>Listing type</h2><select id="type"><option value="">Choose...</option><option value="sale">For sale</option><option value="rent">For rent (long-term)</option><option value="holiday">Holiday home (short stay)</option></select></section>
+<div id="app"></div><pre id="out"></pre>
+<div class="bar"><button class="g" id="clr">Clear</button><button id="sum">Summary</button></div>
+<script>
+const Y=["Yes","No"],YNU=["Yes","No","Unsure"];
+const BEDS=["1","2","3","4","5","6","7","8+"],NUM=["0","1","2","3","4","5","6+"];
+const SEC=[
+{t:"Basics",f:[
+["addr","Street address","text"],["sub","Suburb","text"],
+["ptype","Property type","sel",["House","Villa / duplex","Townhouse","Unit / apartment","Cottage / chalet","Studio","Granny flat","Rural / lifestyle","Land only","Other"]],
+["beds","Bedrooms","sel",BEDS],["baths","Bathrooms","sel",["1","1.5","2","2.5","3","3+"]],["wc","Separate toilets","sel",NUM],
+["car","Parking","sel",["None","1 car","2 car","3 car","4+ car"]],
+["parkt","Parking type","sel",["Garage","Carport","Open driveway","Street only","Mix"]],
+["stor","Storeys","sel",["Single","Double","Split level","Multi"]],
+["yr","Year built (approx.)","text"],["floor","Floor area (m2)","num"],["land","Land size (m2 or ha)","text"],
+["cond","Condition","sel",["Original","Well kept","Renovated","Partly renovated","New build","Needs work"]],
+["facing","Main living faces","sel",["North","North-east","East","South-east","South","South-west","West","North-west","Unsure"]],
+["const","Construction","sel",["Brick","Double brick","Brick and tile","Weatherboard","Rendered","Timber","Steel / colorbond","Hebel / cladding","Mixed"]],
+["roof","Roof","sel",["Colorbond","Tile","Zincalume","Other"]]]},
+{t:"Indoor features",chips:true,f:[
+["in","","chk",["Open-plan living","Separate lounge","Family room","Rumpus / games room","Study / home office","Theatre room","Sunroom","Walk-in robe","Built-in robes","Ensuite","Second ensuite","Walk-in pantry","Butler's pantry","Laundry (separate)","Linen cupboard","Raked / high ceilings","Timber floors","Tiled floors","Carpeted","Polished concrete","Fireplace","Wood heater","Skylights","Plantation shutters","Large windows / light-filled","Separate guest wing","Self-contained annex","Storage room","Attic / loft"]]]},
+{t:"Kitchen",f:[
+["kitchen","Kitchen style","sel",["Modern","Updated","Original","Gourmet","Galley","Open to living","Separate"]],
+["benches","Benchtops","sel",["Stone","Laminate","Timber","Stainless","Other"]],
+["kc","","chk",["Gas cooktop","Electric cooktop","Induction cooktop","Wall oven","Freestanding oven","Dishwasher","Microwave (built-in)","Rangehood","Island bench","Breakfast bar","Pantry","Double sink","Water filter tap"]]]},
+{t:"Heating, cooling and comfort",chips:true,f:[
+["cl","","chk",["Ducted reverse cycle","Split system(s)","Ducted evaporative","Ceiling fans","Gas heating","Wood fire","Underfloor heating","Double glazing","Insulated","Solar hot water","Gas hot water","Heat pump hot water","Instant hot water"]]]},
+{t:"Outdoor",chips:true,f:[
+["out","","chk",["Covered patio / alfresco","Deck","Verandah","Fully fenced backyard","Rear lane / rear access","Private rear gate","Established gardens","Lawn","Low maintenance garden","Reticulation","Bore","Veggie garden","Fruit trees","Pool","Spa","Outdoor kitchen / BBQ area","Fire pit","Shed","Workshop","Double garage","Carport","Side access","Boat / caravan parking","Pet-friendly yard","Playground / cubby","Tennis court","Paddocks","Cattle yards","Dam","Chicken coop"]]]},
+{t:"Utilities and sustainability",f:[
+["nbn","Internet","sel",["NBN fibre to premises","NBN fibre to node","NBN fixed wireless","NBN satellite","Starlink","Other / unsure"]],
+["sew","Sewerage","sel",["Mains sewer","Septic","ATU / aerobic","Unsure"]],
+["wat","Water","sel",["Scheme water","Rainwater tank","Bore","Scheme + tank","Unsure"]],
+["gas","Gas","sel",["Mains gas","LPG bottles","No gas","Unsure"]],
+["sol","Solar panels (kW, or none)","text"],["bat","Battery","sel",["None","Yes","Unsure"]],
+["ev","EV charger","sel",["None","Installed","Wired for one"]],
+["tank","Water tank size (L)","text"]]},
+{t:"Security and extras",chips:true,f:[
+["sec","","chk",["Alarm system","Security screens","CCTV","Intercom","Remote garage","Gated entry","Smoke alarms","Fire sprinklers","Smart home features","Lift / accessible entry","Wheelchair accessible"]]]},
+{t:"Location and lifestyle",f:[
+["pos","Position","sel",["Quiet street","Cul-de-sac","Corner block","Main road","Beachfront","Beach side","Riverfront / waterfront","Rural outlook","Bushland","Golf course","Town centre"]],
+["view","Views","sel",["None","Ocean","Water / inlet","Bush","Hills / vineyard","Rural","Garden","City lights"]],
+["near","Nearby (distances, e.g. beach 400 m)","ta"],
+["nearc","","chk",["Beach","Jetty","Foreshore / river","Primary school","High school","Shops / supermarket","Café / restaurants","Medical","Train / bus","Airport","Parks / playground","Golf course","Wineries","Walking / cycling trails"]],
+["hl","Top three selling points","ta"]]},
+{t:"For sale details",only:"sale",f:[
+["price","Pricing method","sel",["Offers","Offers over","Offers from","Fixed price","Price guide","Auction","Expressions of interest","Contact agent"]],
+["pricev","Figure to publish (if any)","text"],
+["zone","Zoning","text"],
+["title","Title type","sel",["Freehold (green title)","Survey-strata","Strata","Leasehold","Company title","Unsure"]],
+["lot","Lot / plan number","text"],
+["rates","Council rates (per year)","text"],["wrates","Water rates (per year)","text"],["strata","Strata levies (per quarter, if any)","text"],
+["tenant","Occupancy","sel",["Vacant","Owner occupied","Tenanted","Tenant on periodic","Settlement leaseback"]],
+["poss","Possession","sel",["At settlement","Vacant possession","Flexible","Subject to tenant"]],
+["dev","Development or subdivision potential","sel",["None","Subdivision commenced","Subdivision potential (subject to approval)","Duplex potential","Rezoning possible","Unsure"]],
+["flood","Bushfire (BAL) or flood overlay","sel",["None known","Bushfire prone","Flood prone","Both","Unsure"]],
+["inc","Inclusions (what stays)","ta"],["exc","Exclusions","ta"],
+["why","Why a buyer will love it (owner's words)","ta"]]},
+{t:"For rent details",only:"rent",f:[
+["rent","Rent (per week)","text"],["bond","Bond","sel",["2 weeks","3 weeks","4 weeks","Other"]],
+["avail","Available from","date"],
+["term","Lease term","sel",["6 months","12 months","12 months then periodic","Flexible","Fixed to date"]],
+["furn","Furnished","sel",["Unfurnished","Partly furnished","Fully furnished"]],
+["pets","Pets","sel",["No pets","Considered","Small pets considered","Pet friendly"]],
+["smoke","Smoking","sel",["No smoking","Outdoors only","Allowed"]],
+["occ","Maximum occupants","sel",["1","2","3","4","5","6","7+"]],
+["util","Utilities included","chk",["Water (usage)","Electricity","Gas","Internet","Garden maintenance","Pool maintenance","Lawn mowing"]],
+["wuse","Water usage charged to tenant","sel",["Yes","No","Excess only","Unsure"]],
+["insp","Inspection arrangements","sel",["Open home","By appointment","Virtual only","Tenanted (notice needed)"]],
+["rinc","Included extras (e.g. appliances, curtains)","ta"],
+["rrules","House rules or conditions","ta"]]},
+{t:"Holiday home details",only:"holiday",f:[
+["sleeps","Sleeps (max guests)","sel",["2","3","4","5","6","7","8","9","10","11","12","13+"]],
+["bedcfg","Bedding by room (e.g. Bed 1: king, Bed 2: 2 singles)","ta"],
+["nbeds","Beds total","sel",["1","2","3","4","5","6","7","8","9+"]],
+["cot","Cot / highchair","sel",["Both","Cot only","Highchair only","On request","None"]],
+["minstay","Minimum stay","sel",["1 night","2 nights","3 nights","7 nights","Varies by season"]],
+["rate","Nightly rate guide","text"],
+["cin","Check-in","sel",["Self check-in (keysafe)","Smart lock","Meet and greet","Lockbox"]],
+["ctime","Check-in / check-out times","text"],
+["linen","Linen and towels","sel",["Linen and towels supplied","Linen only","Towels only","BYO","Hire available"]],
+["pets_h","Pets","sel",["No pets","On request","Pet friendly"]],
+["kids","Children","sel",["Family friendly","Not suitable for infants","Adults only"]],
+["party","Events and parties","sel",["No parties or events","On request"]],
+["hk","Guest extras","chk",["Wi-Fi","Smart TV / streaming","Board games","Beach towels","Beach gear","Bikes","BBQ","Coffee machine","Starter pack (tea, coffee, milk)","Hair dryer","Iron","Washer","Dryer","Welcome basket","Local guide book","Linen change on long stays","Travel cot","Portable fan / heater"]],
+["kit","Kitchen supplies","chk",["Fully equipped","Oven","Dishwasher","Toaster","Kettle","Blender","Slow cooker","Cookware and crockery","BBQ tools","Wine glasses"]],
+["acc","Access and accessibility","sel",["Step-free","A few steps","Stairs","Not suitable for limited mobility"]],
+["reg","Short-stay registration or approval number","text"],
+["cleaning","Cleaning","sel",["Professional between stays","Guest cleans","Fee applies"]],
+["rules","House rules (quiet hours, max cars, etc.)","ta"]]},
+{t:"Final notes",f:[
+["contact","Agent / contact for enquiries","text"],["story","Anything that makes it different (owner story, history, standout detail)","ta"],["notes","Other notes for the write-up","ta"]]}
+];
+const $=s=>document.querySelector(s);const KEY="ds_prop_intake";let S={};try{S=JSON.parse(localStorage[KEY]||"{}")}catch(e){}
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function fld(sx,[id,lab,t,o]){const k=(sx?sx+"_":"")+id;
+if(t=="chk"){const gr=lab?`<h3>${esc(lab)}</h3>`:"";return gr+`<div class="chips" data-k="${k}">${o.map((x,i)=>`<label><input type="checkbox" data-c="${k}" value="${esc(x)}">${esc(x)}</label>`).join("")}</div>`}
+const l=lab?`<label class="l" for="${k}">${esc(lab)}</label>`:"";
+if(t=="sel")return l+`<select id="${k}"><option value="">-</option>${o.map(x=>`<option>${esc(x)}</option>`).join("")}</select>`;
+if(t=="ta")return l+`<textarea id="${k}"></textarea>`;
+if(t=="num")return l+`<input id="${k}" type="number" inputmode="decimal">`;
+return l+`<input id="${k}" type="${t}">`}
+let h="";SEC.forEach((s,n)=>{h+=`<section data-only="${s.only||""}"><h2>${esc(s.t)}</h2>`+s.f.map(f=>fld("",f)).join("")+`</section>`});
+$("#app").innerHTML=h;
+function vis(){const t=$("#type").value;document.querySelectorAll("section[data-only]").forEach(e=>{const o=e.dataset.only;e.classList.toggle("hide",!!o&&o!=t)})}
+document.querySelectorAll("input[type=text],input[type=number],input[type=date],select,textarea").forEach(e=>{if(S[e.id]!=null)e.value=S[e.id];e.addEventListener("input",()=>{S[e.id]=e.value;localStorage[KEY]=JSON.stringify(S);vis()})});
+document.querySelectorAll("input[data-c]").forEach(e=>{const a=S["c_"+e.dataset.c]||[];e.checked=a.includes(e.value);e.addEventListener("change",()=>{S["c_"+e.dataset.c]=[...document.querySelectorAll(`input[data-c="${e.dataset.c}"]:checked`)].map(x=>x.value);localStorage[KEY]=JSON.stringify(S)})});
+vis();
+const TN={sale:"FOR SALE",rent:"FOR RENT (long-term)",holiday:"HOLIDAY HOME (short stay)"};
+function build(){const t=$("#type").value;let o=`PROPERTY FEATURES FOR MARKETING WRITE-UP\nListing type: ${TN[t]||"Not chosen"}\n`;
+SEC.forEach(s=>{if(s.only&&s.only!=t)return;let b="";
+s.f.forEach(([id,lab,ty,opt])=>{if(ty=="chk"){const a=S["c_"+id]||[];if(a.length)b+=`- ${lab||"Includes"}: ${a.join(", ")}\n`}else{const v=(S[id]||"").trim();if(v)b+=`- ${lab}: ${v.replace(/\n/g,"; ")}\n`}});
+if(b)o+=`\n${s.t.toUpperCase()}\n${b}`});
+return o}
+$("#sum").onclick=async()=>{const t=build(),p=$("#out");p.textContent=t;p.style.display="block";p.scrollIntoView({behavior:"smooth"});
+try{await navigator.clipboard.writeText(t);$("#sum").textContent="Copied - paste to Instinct"}catch(e){$("#sum").textContent="Select and copy above"}setTimeout(()=>$("#sum").textContent="Summary",3500)};
+$("#clr").onclick=()=>{if(confirm("Clear the form?")){localStorage.removeItem(KEY);location.reload()}};
+</script></body></html>
