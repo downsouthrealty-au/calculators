@@ -9,8 +9,9 @@ h1{font-size:22px;margin:6px 0 2px}p.s{color:var(--mut);margin:0 0 14px;font-siz
 .tabs button.on{background:var(--ac);color:#062014}
 section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
 h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin:0 0 10px}
+h2 .note{color:var(--mut);text-transform:none;letter-spacing:0;font-weight:400}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
-input{width:100%;background:#0e1116;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:16px}
+input,select{width:100%;background:#0e1116;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:16px}
 table{width:100%;border-collapse:collapse;font-size:15px}
 td,th{padding:7px 4px;text-align:right;border-bottom:1px solid var(--line)}
 td:first-child,th:first-child{text-align:left}
@@ -32,6 +33,9 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 .fr td input[type=date]{font-size:13px;padding:8px 4px}
 .fr td:nth-child(2) input{text-align:left}
 .fr td:last-child{text-align:center;border-bottom:1px solid var(--line)}
+.prev td,.prev th{font-size:13px;padding:6px 4px}
+.src{color:var(--mut);font-size:12px;margin-top:8px}
+.qbo label{margin-top:8px}
 </style></head><body>
 <h1>Draft pay run &amp; GST tracker</h1>
 <p class="s">Work out a draft pay run to a sales agent, and keep a running track of GST collected. Everything saves on this device as you type. Amounts are GST-inclusive unless marked ex GST. Estimates only - check with your accountant.</p>
@@ -62,9 +66,39 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 <div class="payline" id="payline">-</div>
 <p class="mut">Worked out including GST: the split applies to the total commission, super is worked out on the ex-GST part of the agent split, and the GST amount sits in the agent split to set aside.</p>
 </section>
+<section><h2>Previous pay runs <span class="note">- from QuickBooks</span></h2>
+<table class="prev">
+<thead><tr><th>Paid</th><th>Gross</th><th>PAYG</th><th>Super</th><th>Net</th></tr></thead>
+<tbody>
+<tr><td>27/10/2026</td><td>$13,320</td><td>$5,605</td><td>$1,598</td><td>$7,715</td></tr>
+<tr><td>11/08/2026</td><td>$15,000</td><td>$6,395</td><td>$1,800</td><td>$8,605</td></tr>
+<tr><td>23/06/2026</td><td>$11,700</td><td>$4,849</td><td>-</td><td>$6,851</td></tr>
+<tr><td>19/05/2026</td><td>$16,500</td><td>$7,105</td><td>-</td><td>$9,395</td></tr>
+</tbody>
+</table>
+<p class="src">Weekly Pay Run history for Roger Skelton, checked in QuickBooks 27 Nov 2026. Use these to sense-check the draft above.</p>
+</section>
 </div>
 
 <div id="p2" style="display:none">
+<section class="qbo"><h2>Current BAS position <span class="note">- as set up in QuickBooks</span></h2>
+<label>BAS quarter</label>
+<select id="quarter">
+<option value="2026-09">Jul - Sep 2026</option>
+<option value="2026-12" selected>Oct - Dec 2026</option>
+<option value="2027-03">Jan - Mar 2027</option>
+<option value="2027-06">Apr - Jun 2027</option>
+</select>
+<label>GST collected on sales ($)</label><input id="qcollected" type="number" inputmode="decimal" step="any">
+<label>GST paid on purchases ($)</label><input id="qpaid" type="number" inputmode="decimal" step="any">
+<label>PAYG withholding ($)</label><input id="qpayg" type="number" inputmode="decimal" step="any">
+<label>PAYG instalment ($)</label><input id="qpaygi" type="number" inputmode="decimal" step="any">
+<table class="out" style="margin-top:12px">
+<tr><td>GST due (collected - paid)</td><td id="q1">-</td></tr>
+<tr class="hi"><td>BAS payment due (GST + PAYG)</td><td id="q2">-</td></tr>
+</table>
+<p class="src">Prefilled from QuickBooks as at 27 Nov 2026 (Oct - Dec 2026 quarter: GST collected $2,998, GST paid $1,346, PAYG withholding $5,605). Update these as QuickBooks changes - values save per quarter on this device.</p>
+</section>
 <section><h2>Amounts collected (incl GST)</h2>
 <p class="mut" style="margin-top:0">Add each amount as it comes in to keep a running GST total for the period. The pay run's commission is added automatically as the first row.</p>
 <table id="feetab"><thead><tr><th>Date</th><th>What</th><th>Amount $</th><th>GST</th><th></th></tr></thead><tbody id="feebody"></tbody></table>
@@ -85,9 +119,11 @@ const $=s=>document.querySelector(s);
 const KEY="ds_payrun_gst_tracker";
 const today=new Date().toISOString().slice(0,10);
 const DEF={agent:"",prop:"",pdate:today,price:"1070000",comm:"2.5",split:"50",super:"12",gstrate:"10",
+quarters:{"2026-12":{collected:"2998",paid:"1346",payg:"5605",paygi:""}},
 fees:[[today,"Sales commission - this pay run (auto)",""],["","Leasing / letting fee","690"],["","Marketing campaign","210"],["","Photography","200"],["","Condition report","200"],["","Final bond inspection","200"],["","Lease renewal","110"],["","Routine inspection","70"],["","Admin fee (monthly)","15"],["","Annual summary","55"],["","After-hours callout","70"],["","Tribunal attendance","110"]]};
 let S={};try{S=JSON.parse(localStorage[KEY]||"{}")}catch(e){}
 for(const k in DEF)if(S[k]==null)S[k]=DEF[k];
+if(!S.quarters)S.quarters=DEF.quarters;
 const save=()=>{localStorage[KEY]=JSON.stringify(S)};
 const num=s=>{const n=parseFloat(s);return isNaN(n)?0:n};
 const fmt=n=>isFinite(n)?"$"+n.toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2}):"-";
@@ -107,6 +143,26 @@ function calc(){
   const who=S.agent.trim()?S.agent.trim():"the agent";
   $("#payline").textContent="Pay "+who+" "+fmt(mine)+" (incl "+fmt(gstMine)+" GST) and set aside "+fmt(sup)+" super.";
 }
+// Quarter values
+function qKey(){return $("#quarter").value}
+function qLoad(){
+  const q=S.quarters[qKey()]||{};
+  $("#qcollected").value=q.collected||"";
+  $("#qpaid").value=q.paid||"";
+  $("#qpayg").value=q.payg||"";
+  $("#qpaygi").value=q.paygi||"";
+  qCalc();
+}
+function qCalc(){
+  const q=S.quarters[qKey()]||{};
+  const due=num(q.collected)-num(q.paid);
+  $("#q1").textContent=fmt(due);
+  $("#q2").textContent=fmt(due+num(q.payg)+num(q.paygi));
+}
+$("#quarter").addEventListener("change",qLoad);
+[["qcollected","collected"],["qpaid","paid"],["qpayg","payg"],["qpaygi","paygi"]].forEach(([id,k])=>{
+  $("#"+id).addEventListener("input",()=>{const qk=qKey();if(!S.quarters[qk])S.quarters[qk]={};S.quarters[qk][k]=$("#"+id).value;save();qCalc()});
+});
 function feeRows(){
   const b=$("#feebody");b.innerHTML="";
   S.fees.forEach((f,i)=>{
@@ -131,5 +187,5 @@ $("#t2").onclick=()=>{$("#p1").style.display="none";$("#p2").style.display="";$(
 // Sales commission row mirrors the pay run's total commission
 function syncComm(){if(S.fees.length&&S.fees[0][1]==="Sales commission - this pay run (auto)"){S.fees[0][2]=(num(S.price)*num(S.comm)/100).toFixed(0);S.fees[0][0]=S.pdate||today;save();const tr=$("#feebody").firstChild;if(tr){const ins=tr.querySelectorAll("input");ins[0].value=S.fees[0][0];ins[2].value=S.fees[0][2];updGst(tr,S.fees[0][2])}}}
 ["price","comm","gstrate","pdate"].forEach(id=>$("#"+id).addEventListener("input",()=>{syncComm();feeTotals()}));
-feeRows();calc();syncComm();feeTotals();
+feeRows();calc();syncComm();feeTotals();qLoad();
 </script></body></html>
