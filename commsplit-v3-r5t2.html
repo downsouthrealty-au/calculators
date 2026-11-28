@@ -57,7 +57,8 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 <label>Sale price ($)</label><input id="price" type="number" inputmode="decimal" step="any">
 <label>Commission (% incl GST)</label><input id="comm" type="number" inputmode="decimal" step="any">
 <label>Agent split (% of commission ex GST)</label><input id="split" type="number" inputmode="decimal" step="any">
-<label>Super (% of agent split)</label><input id="super" type="number" inputmode="decimal" step="any">
+<label>PAYG withholding (% of agent split)</label><input id="payg" type="number" inputmode="decimal" step="any">
+<label>Super (% of agent split, paid on top)</label><input id="super" type="number" inputmode="decimal" step="any">
 <label>GST rate (%)</label><input id="gstrate" type="number" inputmode="decimal" step="any">
 </section>
 <section><h2>Pay run summary</h2>
@@ -65,13 +66,14 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 <tr><td>Total commission (incl GST)</td><td id="o1">-</td></tr>
 <tr><td>GST on commission (agency remits)</td><td id="o2">-</td></tr>
 <tr><td>Commission ex GST</td><td id="o6">-</td></tr>
-<tr><td>Agent split (ex GST)</td><td id="o4">-</td></tr>
+<tr><td>Agent split - gross (no GST)</td><td id="o4">-</td></tr>
+<tr><td>PAYG withholding</td><td id="o8">-</td></tr>
+<tr class="hi"><td>Net pay to agent</td><td id="o3">-</td></tr>
+<tr><td>Super on top of split</td><td id="o5">-</td></tr>
 <tr><td>Agency keeps (ex GST)</td><td id="o7">-</td></tr>
-<tr><td>Super to set aside</td><td id="o5">-</td></tr>
-<tr class="hi"><td>Agent take after super</td><td id="o3">-</td></tr>
 </table>
 <div class="payline" id="payline">-</div>
-<p class="mut">GST is taken out of the commission first. The split, super and take-home are all worked out on the ex-GST amount, and the agency remits the GST (it flows to the GST tracker).</p>
+<p class="mut">GST is on the full commission the agency receives and the agency remits it (it flows to the GST tracker). The agent split has no GST. PAYG is taken from the split and super is paid on top of it. The PAYG % is an estimate based on previous runs (about 42%).</p>
 </section>
 <section><h2>Previous pay runs <span class="note">- from QuickBooks</span></h2>
 <table class="prev">
@@ -125,7 +127,7 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 const $=s=>document.querySelector(s);
 const KEY="ds_payrun_gst_tracker";
 const today=new Date().toISOString().slice(0,10);
-const DEF={agent:"",prop:"",pdate:today,price:"1070000",comm:"2.5",split:"50",super:"12",gstrate:"10",
+const DEF={agent:"",prop:"",pdate:today,price:"1070000",comm:"2.5",split:"50",super:"12",payg:"42",gstrate:"10",
 quarters:{"2026-12":{collected:"2998",paid:"1346",payg:"5605",paygi:""}},
 fees:[[today,"Sales commission - this pay run (auto)",""],["","Leasing / letting fee","690","1"],["","Marketing campaign","210","1"],["","Photography","200","1"],["","Condition report","200","1"],["","Final bond inspection","200","1"],["","Lease renewal","110","1"],["","Routine inspection","70","1"],["","Admin fee (monthly)","15","1"],["","Annual summary","55","1"],["","After-hours callout","70","1"],["","Tribunal attendance","110","1"]]};
 let S={};try{S=JSON.parse(localStorage[KEY]||"{}")}catch(e){}
@@ -135,7 +137,7 @@ S.fees.forEach(f=>{if(f[3]==null||f[3]==="")f[3]="1"});
 const save=()=>{localStorage[KEY]=JSON.stringify(S)};
 const num=s=>{const n=parseFloat(s);return isNaN(n)?0:n};
 const fmt=n=>isFinite(n)?"$"+n.toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2}):"-";
-["agent","prop","pdate","price","comm","split","super","gstrate"].forEach(id=>{const e=$("#"+id);e.value=S[id];e.addEventListener("input",()=>{S[id]=e.value;save();calc()})});
+["agent","prop","pdate","price","comm","split","payg","super","gstrate"].forEach(id=>{const e=$("#"+id);e.value=S[id];e.addEventListener("input",()=>{S[id]=e.value;save();calc()})});
 function gstOf(amt){const r=num(S.gstrate);return amt*r/(100+r)}
 function calc(){
   const total=num(S.price)*num(S.comm)/100;
@@ -143,15 +145,17 @@ function calc(){
   const ex=total-gst;
   const mine=ex*num(S.split)/100;
   const sup=mine*num(S.super)/100;
+  const payg=mine*num(S.payg)/100;
   $("#o1").textContent=fmt(total);
   $("#o2").textContent=fmt(gst);
   $("#o6").textContent=fmt(ex);
   $("#o4").textContent=fmt(mine);
   $("#o7").textContent=fmt(ex-mine);
   $("#o5").textContent=fmt(sup);
-  $("#o3").textContent=fmt(mine-sup);
+  $("#o3").textContent=fmt(mine-payg);
+  $("#o8").textContent=fmt(payg);
   const who=S.agent.trim()?S.agent.trim():"the agent";
-  $("#payline").textContent="Pay "+who+" "+fmt(mine)+" (ex GST) and set aside "+fmt(sup)+" super. Agency remits "+fmt(gst)+" GST.";
+  $("#payline").textContent="Pay "+who+" "+fmt(mine-payg)+" net ("+fmt(mine)+" gross less "+fmt(payg)+" PAYG). Super "+fmt(sup)+" on top. Agency remits "+fmt(gst)+" GST.";
 }
 // Quarter values
 function qKey(){return $("#quarter").value}
