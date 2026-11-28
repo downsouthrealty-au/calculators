@@ -26,19 +26,25 @@ button.add{background:#262c36;color:var(--tx);border:0;border-radius:10px;paddin
 button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 6px;cursor:pointer}
 .fr td input{padding:8px;font-size:15px;text-align:right;width:100%}
 #feetab{table-layout:fixed}
-#feetab th:nth-child(1),#feetab td:nth-child(1){width:20%}
-#feetab th:nth-child(3),#feetab td:nth-child(3){width:17%}
-#feetab th:nth-child(4),#feetab td:nth-child(4){width:13%}
+#feetab th:nth-child(1),#feetab td:nth-child(1){width:37%}
+#feetab th:nth-child(2),#feetab td:nth-child(2){width:11%}
+#feetab th:nth-child(3),#feetab td:nth-child(3){width:20%}
+#feetab th:nth-child(4),#feetab td:nth-child(4){width:24%}
 #feetab th:nth-child(5),#feetab td:nth-child(5){width:8%}
+.fr td input{padding:8px 4px}
+.fr td{vertical-align:top}
+.fr td:first-child input[type=date]{margin-top:4px}
+.fr .g small{display:block;color:var(--mut);font-size:12px;font-weight:400}
+.fr .g{font-weight:600;padding-top:14px;font-size:14px}
 .fr td input[type=date]{font-size:13px;padding:8px 4px}
-.fr td:nth-child(2) input{text-align:left}
-.fr td:last-child{text-align:center;border-bottom:1px solid var(--line)}
+.fr td:first-child input{text-align:left}
+.fr td:last-child{text-align:center;border-bottom:1px solid var(--line);padding-top:8px}
 .prev td,.prev th{font-size:13px;padding:6px 4px}
 .src{color:var(--mut);font-size:12px;margin-top:8px}
 .qbo label{margin-top:8px}
 </style></head><body>
 <h1>Draft pay run &amp; GST tracker</h1>
-<p class="s">Work out a draft pay run to a sales agent, and keep a running track of GST collected. Everything saves on this device as you type. Amounts are GST-inclusive unless marked ex GST. Estimates only - check with your accountant.</p>
+<p class="s">Work out a draft pay run to a sales agent, and keep a running track of GST collected. Everything saves on this device as you type. Commission is entered GST-inclusive; the agent split is worked out ex GST, like a real pay run. Estimates only - check with your accountant.</p>
 <div class="tabs"><button id="t1" class="on">Draft pay run</button><button id="t2">GST tracker</button></div>
 
 <div id="p1">
@@ -50,21 +56,24 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 <section><h2>Sale figures</h2>
 <label>Sale price ($)</label><input id="price" type="number" inputmode="decimal" step="any">
 <label>Commission (% incl GST)</label><input id="comm" type="number" inputmode="decimal" step="any">
-<label>Agent split (% of commission incl GST)</label><input id="split" type="number" inputmode="decimal" step="any">
-<label>Super (% of agent split ex GST)</label><input id="super" type="number" inputmode="decimal" step="any">
+<label>Agent split (% of commission ex GST)</label><input id="split" type="number" inputmode="decimal" step="any">
+<label>PAYG withholding (% of agent split)</label><input id="payg" type="number" inputmode="decimal" step="any">
+<label>Super (% of agent split, paid on top)</label><input id="super" type="number" inputmode="decimal" step="any">
 <label>GST rate (%)</label><input id="gstrate" type="number" inputmode="decimal" step="any">
 </section>
 <section><h2>Pay run summary</h2>
 <table class="out">
 <tr><td>Total commission (incl GST)</td><td id="o1">-</td></tr>
-<tr><td>Agent split (incl GST)</td><td id="o4">-</td></tr>
-<tr><td>Agency keeps (incl GST)</td><td id="o7">-</td></tr>
-<tr><td>Super to set aside</td><td id="o5">-</td></tr>
-<tr><td>GST amount (in agent split)</td><td id="o2">-</td></tr>
-<tr class="hi"><td>Agent take after GST &amp; super</td><td id="o3">-</td></tr>
+<tr><td>GST on commission (agency remits)</td><td id="o2">-</td></tr>
+<tr><td>Commission ex GST</td><td id="o6">-</td></tr>
+<tr><td>Agent split - gross (no GST)</td><td id="o4">-</td></tr>
+<tr><td>PAYG withholding</td><td id="o8">-</td></tr>
+<tr class="hi"><td>Net pay to agent</td><td id="o3">-</td></tr>
+<tr><td>Super on top of split</td><td id="o5">-</td></tr>
+<tr><td>Agency keeps (ex GST)</td><td id="o7">-</td></tr>
 </table>
 <div class="payline" id="payline">-</div>
-<p class="mut">Worked out including GST: the split applies to the total commission, super is worked out on the ex-GST part of the agent split, and the GST amount sits in the agent split to set aside.</p>
+<p class="mut">GST is on the full commission the agency receives and the agency remits it (it flows to the GST tracker). The agent split has no GST. PAYG is taken from the split and super is paid on top of it. The PAYG % is an estimate based on previous runs (about 42%).</p>
 </section>
 <section><h2>Previous pay runs <span class="note">- from QuickBooks</span></h2>
 <table class="prev">
@@ -99,10 +108,10 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 </table>
 <p class="src">Prefilled from QuickBooks as at 27 Nov 2026 (Oct - Dec 2026 quarter: GST collected $2,998, GST paid $1,346, PAYG withholding $5,605). Update these as QuickBooks changes - values save per quarter on this device.</p>
 </section>
-<section><h2>Amounts collected (incl GST)</h2>
-<p class="mut" style="margin-top:0">Add each amount as it comes in to keep a running GST total for the period. The pay run's commission is added automatically as the first row.</p>
-<table id="feetab"><thead><tr><th>Date</th><th>What</th><th>Amount $</th><th>GST</th><th></th></tr></thead><tbody id="feebody"></tbody></table>
-<button class="add" id="addrow">+ Add amount</button>
+<section><h2>Items collected (incl GST)</h2>
+<p class="mut" style="margin-top:0">Set the quantity for each item and change the dollar amount (each, incl GST) if a fee changes. Use + Add item for anything extra. The pay run's commission is added automatically as the first row.</p>
+<table id="feetab"><thead><tr><th>Item</th><th>Qty</th><th>Each $</th><th>Total</th><th></th></tr></thead><tbody id="feebody"></tbody></table>
+<button class="add" id="addrow">+ Add item</button>
 </section>
 <section><h2>Running totals</h2>
 <table class="out">
@@ -118,30 +127,35 @@ button.del{background:none;border:0;color:var(--mut);font-size:18px;padding:4px 
 const $=s=>document.querySelector(s);
 const KEY="ds_payrun_gst_tracker";
 const today=new Date().toISOString().slice(0,10);
-const DEF={agent:"",prop:"",pdate:today,price:"1070000",comm:"2.5",split:"50",super:"12",gstrate:"10",
+const DEF={agent:"",prop:"",pdate:today,price:"1070000",comm:"2.5",split:"50",super:"12",payg:"42",gstrate:"10",
 quarters:{"2026-12":{collected:"2998",paid:"1346",payg:"5605",paygi:""}},
-fees:[[today,"Sales commission - this pay run (auto)",""],["","Leasing / letting fee","690"],["","Marketing campaign","210"],["","Photography","200"],["","Condition report","200"],["","Final bond inspection","200"],["","Lease renewal","110"],["","Routine inspection","70"],["","Admin fee (monthly)","15"],["","Annual summary","55"],["","After-hours callout","70"],["","Tribunal attendance","110"]]};
+fees:[[today,"Sales commission - this pay run (auto)",""],["","Leasing / letting fee","690","1"],["","Marketing campaign","210","1"],["","Photography","200","1"],["","Condition report","200","1"],["","Final bond inspection","200","1"],["","Lease renewal","110","1"],["","Routine inspection","70","1"],["","Admin fee (monthly)","15","1"],["","Annual summary","55","1"],["","After-hours callout","70","1"],["","Tribunal attendance","110","1"]]};
 let S={};try{S=JSON.parse(localStorage[KEY]||"{}")}catch(e){}
 for(const k in DEF)if(S[k]==null)S[k]=DEF[k];
 if(!S.quarters)S.quarters=DEF.quarters;
+S.fees.forEach(f=>{if(f[3]==null||f[3]==="")f[3]="1"});
 const save=()=>{localStorage[KEY]=JSON.stringify(S)};
 const num=s=>{const n=parseFloat(s);return isNaN(n)?0:n};
 const fmt=n=>isFinite(n)?"$"+n.toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2}):"-";
-["agent","prop","pdate","price","comm","split","super","gstrate"].forEach(id=>{const e=$("#"+id);e.value=S[id];e.addEventListener("input",()=>{S[id]=e.value;save();calc()})});
+["agent","prop","pdate","price","comm","split","payg","super","gstrate"].forEach(id=>{const e=$("#"+id);e.value=S[id];e.addEventListener("input",()=>{S[id]=e.value;save();calc()})});
 function gstOf(amt){const r=num(S.gstrate);return amt*r/(100+r)}
 function calc(){
   const total=num(S.price)*num(S.comm)/100;
-  const mine=total*num(S.split)/100;
-  const gstMine=gstOf(mine);
-  const sup=(mine-gstMine)*num(S.super)/100;
+  const gst=gstOf(total);
+  const ex=total-gst;
+  const mine=ex*num(S.split)/100;
+  const sup=mine*num(S.super)/100;
+  const payg=mine*num(S.payg)/100;
   $("#o1").textContent=fmt(total);
+  $("#o2").textContent=fmt(gst);
+  $("#o6").textContent=fmt(ex);
   $("#o4").textContent=fmt(mine);
-  $("#o7").textContent=fmt(total-mine);
+  $("#o7").textContent=fmt(ex-mine);
   $("#o5").textContent=fmt(sup);
-  $("#o2").textContent=fmt(gstMine);
-  $("#o3").textContent=fmt(mine-sup-gstMine);
+  $("#o3").textContent=fmt(mine-payg);
+  $("#o8").textContent=fmt(payg);
   const who=S.agent.trim()?S.agent.trim():"the agent";
-  $("#payline").textContent="Pay "+who+" "+fmt(mine)+" (incl "+fmt(gstMine)+" GST) and set aside "+fmt(sup)+" super.";
+  $("#payline").textContent="Pay "+who+" "+fmt(mine-payg)+" net ("+fmt(mine)+" gross less "+fmt(payg)+" PAYG). Super "+fmt(sup)+" on top. Agency remits "+fmt(gst)+" GST.";
 }
 // Quarter values
 function qKey(){return $("#quarter").value}
@@ -167,25 +181,27 @@ function feeRows(){
   const b=$("#feebody");b.innerHTML="";
   S.fees.forEach((f,i)=>{
     const tr=document.createElement("tr");tr.className="fr";
-    tr.innerHTML=`<td><input data-i="${i}" data-f="0" type="date" value=""></td><td><input data-i="${i}" data-f="1" value=""></td><td><input data-i="${i}" data-f="2" type="number" inputmode="decimal" step="any" value=""></td><td class="g"></td><td><button class="del" data-i="${i}">&#215;</button></td>`;
-    const ins=tr.querySelectorAll("input");
-    ins[0].value=f[0];ins[1].value=f[1];ins[2].value=f[2];
-    ins.forEach(inp=>inp.addEventListener("input",()=>{S.fees[i][+inp.dataset.f]=inp.value;save();feeTotals();updGst(tr,f[2])}));
+    tr.innerHTML=`<td><input data-f="1" placeholder="Item"><input data-f="0" type="date"></td><td><input data-f="3" type="number" inputmode="decimal" step="any"></td><td><input data-f="2" type="number" inputmode="decimal" step="any"></td><td class="g"></td><td><button class="del">&#215;</button></td>`;
+    tr.querySelectorAll("input").forEach(inp=>{
+      inp.value=f[+inp.dataset.f];
+      inp.addEventListener("input",()=>{S.fees[i][+inp.dataset.f]=inp.value;save();updLine(tr,S.fees[i]);feeTotals()});
+    });
     tr.querySelector(".del").onclick=()=>{S.fees.splice(i,1);save();feeRows();feeTotals()};
-    b.appendChild(tr);updGst(tr,f[2]);
+    b.appendChild(tr);updLine(tr,f);
   });
 }
-function updGst(tr,amt){tr.querySelector(".g").textContent=amt!==""&&!isNaN(parseFloat(amt))?fmt(gstOf(num(amt))):"-"}
+function lineAmt(f){const u=f[2]===""?0:num(f[2]);return u*(f[3]===""?0:num(f[3]))}
+function updLine(tr,f){const t=lineAmt(f);const has=f[2]!==""&&!isNaN(parseFloat(f[2]));tr.querySelector(".g").innerHTML=has?fmt(t)+"<small>GST "+fmt(gstOf(t))+"</small>":"-"}
 function feeTotals(){
   let tc=0,tg=0;
-  S.fees.forEach(f=>{const a=f[2]===""?0:num(f[2]);tc+=a;tg+=gstOf(a)});
+  S.fees.forEach(f=>{const a=lineAmt(f);tc+=a;tg+=gstOf(a)});
   $("#f1").textContent=fmt(tc);$("#f2").textContent=fmt(tg);$("#f3").textContent=fmt(tc-tg);
 }
-$("#addrow").onclick=()=>{S.fees.push([S.pdate||today,"",""]);save();feeRows();feeTotals()};
+$("#addrow").onclick=()=>{S.fees.push([S.pdate||today,"","","1"]);save();feeRows();feeTotals()};
 $("#t1").onclick=()=>{$("#p1").style.display="";$("#p2").style.display="none";$("#t1").className="on";$("#t2").className=""};
 $("#t2").onclick=()=>{$("#p1").style.display="none";$("#p2").style.display="";$("#t2").className="on";$("#t1").className=""};
 // Sales commission row mirrors the pay run's total commission
-function syncComm(){if(S.fees.length&&S.fees[0][1]==="Sales commission - this pay run (auto)"){S.fees[0][2]=(num(S.price)*num(S.comm)/100).toFixed(0);S.fees[0][0]=S.pdate||today;save();const tr=$("#feebody").firstChild;if(tr){const ins=tr.querySelectorAll("input");ins[0].value=S.fees[0][0];ins[2].value=S.fees[0][2];updGst(tr,S.fees[0][2])}}}
+function syncComm(){if(S.fees.length&&S.fees[0][1]==="Sales commission - this pay run (auto)"){S.fees[0][2]=(num(S.price)*num(S.comm)/100).toFixed(0);S.fees[0][3]="1";S.fees[0][0]=S.pdate||today;save();const tr=$("#feebody").firstChild;if(tr){const ins=tr.querySelectorAll("input");ins[1].value=S.fees[0][0];ins[2].value=S.fees[0][3];ins[3].value=S.fees[0][2];updLine(tr,S.fees[0])}}}
 ["price","comm","gstrate","pdate"].forEach(id=>$("#"+id).addEventListener("input",()=>{syncComm();feeTotals()}));
 feeRows();calc();syncComm();feeTotals();qLoad();
 </script></body></html>
